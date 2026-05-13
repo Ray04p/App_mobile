@@ -41,34 +41,48 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     notes = TextEditingController(text: r?.notes ?? '');
   }
 
-  void save() {
+  Future<void> save() async {
     if (!formKey.currentState!.validate()) return;
 
     final recipe = Recipe(
       id: widget.recipe?.id,
-      name: name.text,
-      description: description.text,
-      category: category.text,
-      preparationTime: int.tryParse(time.text) ?? 0,
-      difficulty: difficulty.text,
-      portions: int.tryParse(portions.text) ?? 1,
+      name: name.text.trim(),
+      description: description.text.trim(),
+      category: category.text.trim(),
+      preparationTime: int.tryParse(time.text.trim()) ?? 0,
+      difficulty: difficulty.text.trim(),
+      portions: int.tryParse(portions.text.trim()) ?? 1,
       ingredients: ingredients.text
           .split(',')
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty)
           .toList(),
-      notes: notes.text,
+      notes: notes.text.trim(),
+      isRecommended: widget.recipe?.isRecommended ?? false,
+      isFavorite: widget.recipe?.isFavorite ?? false,
     );
 
     final app = Provider.of<AppState>(context, listen: false);
 
-    if (widget.recipe == null) {
-      app.addRecipe(recipe);
-    } else {
-      app.updateRecipe(recipe);
-    }
+    try {
+      if (widget.recipe == null) {
+        await app.addRecipe(recipe);
+      } else {
+        await app.updateRecipe(recipe);
+      }
 
-    Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      print('ERRORE SALVATAGGIO RICETTA: $e');
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Errore salvataggio: $e'),
+        ),
+      );
+    }
   }
 
   Widget field(String label, TextEditingController controller,
@@ -116,7 +130,9 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
             field('Note', notes, maxLines: 2),
             const SizedBox(height: 8),
             ElevatedButton.icon(
-              onPressed: save,
+              onPressed: () async {
+                await save();
+              },
               icon: const Icon(Icons.save),
               label: const Text('Salva'),
             ),

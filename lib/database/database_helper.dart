@@ -23,8 +23,9 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -39,11 +40,29 @@ class DatabaseHelper {
         difficulty TEXT NOT NULL,
         portions INTEGER NOT NULL,
         ingredients TEXT NOT NULL,
-        notes TEXT
+        notes TEXT,
+        isRecommended INTEGER NOT NULL DEFAULT 0,
+        isFavorite INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
     await _insertDefaultRecipes(db);
+  }
+
+  Future<void> _upgradeDB(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE recipes ADD COLUMN isRecommended INTEGER NOT NULL DEFAULT 0',
+      );
+
+      await db.execute(
+        'ALTER TABLE recipes ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0',
+      );
+    }
   }
 
   Future<void> _insertDefaultRecipes(Database db) async {
