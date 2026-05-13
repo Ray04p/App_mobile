@@ -33,6 +33,7 @@ analysis_benchmark.json
 
 # Flutter/Dart/Pub related
 **/doc/api/
+build/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -45,13 +46,14 @@ flutter_*.png
 linked_*.ds
 unlinked.ds
 unlinked_spec.ds
+.idea/
+.metadata
+*.iml
 
 # Android related
 **/android/**/gradle-wrapper.jar
 .gradle/
 **/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
