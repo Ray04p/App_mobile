@@ -25,14 +25,20 @@ class PantryScreen extends StatelessWidget {
       ),
       body: app.pantry.isEmpty
           ? const Center(child: Text('Nessun prodotto in dispensa'))
-          : ListView.builder(
+          //  Uso del ReorderableListView invece di ListView
+          : ReorderableListView.builder(
               itemCount: app.pantry.length,
+              
+              onReorder: (oldIndex, newIndex) {
+                app.reorderPantryItems(oldIndex, newIndex);
+              },
+              
               itemBuilder: (context, index) {
                 final item = app.pantry[index];
 
                 return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  key: ValueKey(item.id), //uso della chiave per gestire lo scambio di posizione
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: ListTile(
                     title: Text(item.name),
                     subtitle: Text(

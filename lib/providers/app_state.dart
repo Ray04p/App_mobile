@@ -19,7 +19,7 @@ class AppState extends ChangeNotifier {
     loadRecipesFromDatabase();
   }
 
-  // -------------------------
+  // ------------------------- 
   // CARICAMENTO DATI
   // -------------------------
 
@@ -126,6 +126,18 @@ class AppState extends ChangeNotifier {
   void deletePantryItem(String id) {
     pantry.removeWhere((item) => item.id == id);
     saveData();
+    notifyListeners();
+  }
+
+  void reorderPantryItems(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final item = pantry.removeAt(oldIndex);
+    pantry.insert(newIndex, item);
+
+    saveData(); // Fondamentale per salvare il nuovo ordine in SharedPreferences!
     notifyListeners();
   }
 
