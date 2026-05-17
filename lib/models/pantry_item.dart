@@ -25,6 +25,11 @@ class PantryItem {
     return days >= 0 && days <= 3;
   }
 
+bool get isExpired {
+    if (expiryDate == null) return false;
+    return expiryDate!.isBefore(DateTime.now());
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,

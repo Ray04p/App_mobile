@@ -50,15 +50,16 @@ class PantryScreen extends StatelessWidget {
                     title: Text(item.name),
                     subtitle: Text(
                       '${item.quantity} ${item.unit} • ${item.category}'
-                      '${item.expiryDate != null ? ' • Scade: ${DateFormat('dd/MM/yyyy').format(item.expiryDate!)}' : ''}',
-                    ),
+                      '${item.expiryDate != null ? ' • ${item.isExpired ? 'Scaduto' : 'Scade'}: ${DateFormat('dd/MM/yyyy').format(item.expiryDate!)}' : ''}',                    ),
                     leading: Icon(
-                      item.isExpiringSoon
-                          ? Icons.warning
-                          : item.isLowStock
+                      item.isExpired
+                          ? Icons.dangerous //Scaduto
+                        : item.isExpiringSoon
+                          ? Icons.warning // Quasi scaduto
+                        : item.isLowStock
                           ? Icons.remove_circle_outline
-                          : Icons.inventory,
-                      color: item.isExpiringSoon ? Colors.orange : null,
+                        : Icons.inventory,
+                      color: item.isExpiringSoon ? Colors.orange : item.isExpired ? Colors.red : null,
                     ),
 
                     trailing: Row(
