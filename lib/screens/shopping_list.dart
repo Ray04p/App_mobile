@@ -22,6 +22,8 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
+    final sortedList = app.shoppingList.toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase())); //..sort "operatore cascata" crea e applicata
 
     return Scaffold(
       appBar: AppBar(title: const Text('Lista Spesa')),
@@ -57,12 +59,12 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
             ),
           ),
           Expanded(
-            child: app.shoppingList.isEmpty
+            child: sortedList.isEmpty
                 ? const Center(child: Text('Lista vuota'))
                 : ListView.builder(
-                    itemCount: app.shoppingList.length,
+                    itemCount: sortedList.length,
                     itemBuilder: (context, index) {
-                      final item = app.shoppingList[index];
+                      final item = sortedList[index]; //sotituzione di app.List con sortedlist
 
                       return CheckboxListTile(
                         title: Text(
