@@ -19,7 +19,7 @@ class AppState extends ChangeNotifier {
     loadRecipesFromDatabase();
   }
 
-  // ------------------------- 
+  // -------------------------
   // CARICAMENTO DATI
   // -------------------------
 
@@ -157,6 +157,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reorderMealPlanItems(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = mealPlan.removeAt(oldIndex);
+    mealPlan.insert(newIndex, item);
+    notifyListeners();
+  }
+  
   // ------------------------
   // RICETTE PREFERITE
   // ------------------------

@@ -37,7 +37,6 @@ class PantryScreen extends StatelessWidget {
 
               itemBuilder: (context, index) {
                 final item = app.pantry[index];
-
                 return Card(
                   key: ValueKey(
                     item.id,
