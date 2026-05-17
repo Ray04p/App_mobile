@@ -122,4 +122,4 @@ app.*.symbols
 
 # Exceptions mc
 .DS_Store
-
+devtools_options.yaml

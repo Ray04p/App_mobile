@@ -76,12 +76,15 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
   }
 
   Widget field(String label, TextEditingController controller,
-      {TextInputType type = TextInputType.text}) {
+      {TextInputType type = TextInputType.text, 
+      TextInputAction action = TextInputAction.next,}) {
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         keyboardType: type,
+        textInputAction: action, //action per andare da capo con invio
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
