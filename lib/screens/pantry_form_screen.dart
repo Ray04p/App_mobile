@@ -80,8 +80,8 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
     TextEditingController controller, {
     TextInputType type = TextInputType.text,
     TextInputAction action = TextInputAction.next,
-    String? Function(String?)? validator,
-  }) {
+    String? Function(String?)? validator,}) {
+      
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(

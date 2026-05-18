@@ -10,13 +10,12 @@ class StatsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
     final expiring = app.expiringItems();
+    final expired = app.expiredItems();
 
     final avgTime = app.recipes.isEmpty
         ? 0
-        : app.recipes
-                .map((e) => e.preparationTime)
-                .reduce((a, b) => a + b) ~/
-            app.recipes.length;
+        : app.recipes.map((e) => e.preparationTime).reduce((a, b) => a + b) ~/
+              app.recipes.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Statistiche')),
@@ -29,6 +28,7 @@ class StatsScreen extends StatelessWidget {
           statCard('Elementi lista spesa', app.shoppingList.length.toString()),
           statCard('Tempo medio preparazione', '$avgTime min'),
           statCard('Prodotti vicini alla scadenza', expiring.length.toString()),
+          statCard('Prodotti scaduti', expired.length.toString()),
 
           const SizedBox(height: 16),
           const Text(
@@ -51,14 +51,14 @@ class StatsScreen extends StatelessWidget {
                 'Ricette preferite',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text('${app.favoriteRecipes().length} ricette salvate come preferite'),
+              subtitle: Text(
+                '${app.favoriteRecipes().length} ricette salvate come preferite',
+              ),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const RecipesScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const RecipesScreen()),
                 );
               },
             ),

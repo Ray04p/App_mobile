@@ -257,6 +257,10 @@ class AppState extends ChangeNotifier {
     return pantry.where((item) => item.isExpiringSoon).toList();
   }
 
+  List<PantryItem> expiredItems() {
+    return pantry.where((item) => item.isExpired).toList();
+  }
+
   int get totalRecipes => recipes.length;
 
   int get totalPantryItems => pantry.length;
