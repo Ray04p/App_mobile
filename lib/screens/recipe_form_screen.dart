@@ -86,12 +86,14 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
   }
 
   Widget field(String label, TextEditingController controller,
-      {TextInputType type = TextInputType.text, int maxLines = 1}) {
+      {TextInputType type = TextInputType.text, int maxLines = 1,
+      TextInputAction action = TextInputAction.next,}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         keyboardType: type,
+        textInputAction: action, //per andare da capo
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
