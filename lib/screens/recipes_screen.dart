@@ -26,26 +26,43 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ricette')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const RecipeFormScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+      
+
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Cerca ricetta o categoria',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) => setState(() => search = value),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Cerca ricetta o categoria',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) => setState(() => search = value),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                  ),
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RecipeFormScreen()),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
 
@@ -87,6 +104,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               const Row(
                                 children: [
@@ -105,15 +123,16 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                               Text(
                                 recipe.name,
                                 style: const TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              Text(recipe.category),
+                              Text(recipe.category,overflow: TextOverflow.ellipsis),
                             ],
                           ),
                         ),

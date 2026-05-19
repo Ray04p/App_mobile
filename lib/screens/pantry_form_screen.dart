@@ -129,7 +129,9 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
               },
             ),
             field('Unità di misura', unit),
-            field('Note', notes),
+            field('Note', notes,
+              validator: (value) => null,
+            ),
             OutlinedButton.icon(
               onPressed: pickDate,
               icon: const Icon(Icons.calendar_month),
