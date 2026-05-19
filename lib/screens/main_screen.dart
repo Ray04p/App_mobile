@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   //  HomeScreen(),
     RecipesScreen(),
     PantryScreen(),
-    MealPlanScreen(),
+    MealPlanScreen() ,
     ShoppingListScreen() ,
     StatsScreen() ,
   ];
