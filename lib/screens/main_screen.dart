@@ -27,9 +27,9 @@ class _MainScreenState extends State<MainScreen> {
   //  HomeScreen(),
     RecipesScreen(),
     PantryScreen(),
-    MealPlanScreen() ,
-    ShoppingListScreen() ,
-    StatsScreen() ,
+    MealPlanScreen(),
+    ShoppingListScreen(),
+    StatsScreen(),
   ];
 
   // Voci della barra in basso
