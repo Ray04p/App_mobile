@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:meal_planner_project/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/app_state.dart';
-import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MealMateApp());
@@ -19,12 +19,10 @@ class MealMateApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'MealMate',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.green,
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
         ),
-        home: const HomeScreen(),
+        home: const MainScreen(),
       ),
     );
   }

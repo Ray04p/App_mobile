@@ -44,8 +44,16 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: () => addItem(app),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                  ),
                   icon: const Icon(Icons.add),
+                  onPressed: () => addItem(app),
                 ),
               ],
             ),
