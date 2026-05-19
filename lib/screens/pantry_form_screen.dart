@@ -80,8 +80,8 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
     TextEditingController controller, {
     TextInputType type = TextInputType.text,
     TextInputAction action = TextInputAction.next,
-    String? Function(String?)? validator,}) {
-      
+    String? Function(String?)? validator,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -119,17 +119,30 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
           children: [
             field('Nome prodotto', name),
             field('Categoria', category),
-            field('Quantità',quantity,type: TextInputType.number,
-              validator: (value) { //verifica se l'utente inserisci un numero naturale o altro 
-                if (value == null || value.trim().isEmpty) return 'Campo obbligatorio';
+            field(
+              'Quantità',
+              quantity,
+              type: TextInputType.number,
+              validator: (value) {
+                //verifica se l'utente inserisci un numero naturale o altro
+                if (value == null || value.trim().isEmpty) {
+                  return 'Campo obbligatorio';
+                }
                 final doubleValue = double.tryParse(value);
-                if (doubleValue == null) return 'Inserisci un numero intero valido';
-                if (doubleValue <= 0.0) return 'Inserisci un numero maggiore di zero';
+                if (doubleValue == null) {
+                  return 'Inserisci un numero intero valido';
+                }
+                if (doubleValue <= 0.0) {
+                  return 'Inserisci un numero maggiore di zero';
+                }
                 return null;
               },
             ),
             field('Unità di misura', unit),
-            field('Note', notes),
+            field('Note', notes,
+              validator: (value) => null,
+            ),
+
             OutlinedButton.icon(
               onPressed: pickDate,
               icon: const Icon(Icons.calendar_month),
