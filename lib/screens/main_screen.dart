@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     PantryScreen(),
     MealPlanScreen(),
     ShoppingListScreen(),
-    StatsScreen(),
+    StatsScreen() ,
   ];
 
   // Voci della barra in basso
