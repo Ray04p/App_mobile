@@ -85,9 +85,13 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     }
   }
 
-  Widget field(String label, TextEditingController controller,
-      {TextInputType type = TextInputType.text, int maxLines = 1,
-      TextInputAction action = TextInputAction.next,}) {
+  Widget field(
+    String label, 
+    TextEditingController controller,{
+    TextInputType type = TextInputType.text, int maxLines = 1,
+    TextInputAction action = TextInputAction.next,
+    String? Function(String?)? validator}) {
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -99,7 +103,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
           labelText: label,
           border: const OutlineInputBorder(),
         ),
-        validator: (value) {
+        validator: validator ?? (value) {
           if (value == null || value.trim().isEmpty) {
             return 'Campo obbligatorio';
           }
@@ -129,7 +133,9 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
             field('Difficoltà', difficulty),
             field('Porzioni', portions, type: TextInputType.number),
             field('Ingredienti separati da virgola', ingredients, maxLines: 3),
-            field('Note', notes, maxLines: 2),
+            field('Note', notes, maxLines: 2,
+              validator: (value) => null,),
+            
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () async {
