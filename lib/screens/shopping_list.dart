@@ -62,7 +62,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: ElevatedButton.icon(
               onPressed: app.generateShoppingListFromMealPlan,
-              icon: const Icon(Icons.auto_awesome),
+              icon: const Icon(Icons.auto_fix_high),
               label: const Text('Genera dal meal plan'),
             ),
           ),

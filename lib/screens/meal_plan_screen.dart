@@ -133,17 +133,17 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () =>
-                          app.deleteMealPlanItem(app.mealPlan[i].id),
-                    ),
                     ReorderableDragStartListener(
                       index: i, // L'indice esatto della riga
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 8.0),
                         child: Icon(Icons.drag_handle, color: Colors.grey),
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () =>
+                          app.deleteMealPlanItem(app.mealPlan[i].id),
                     ),
                   ],
                 ),
