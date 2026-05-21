@@ -1,0 +1,35 @@
+
+RICETTE
+( ) Controllo dei numeri nel form
+( ) Mostrare solo le ricette fattibili con gli ingredienti che abbiamo
+( ) Mostrare in un'altra lista tutte le ricette che abbiamo creato
+
+  * Opzionale:
+    ( ) Mettere anche gli spuntini
+
+DISPENSA
+( ) Filtri in base a vari criteri
+    O più semplice:
+    ( ) Ordinamento in base alfabetico e in ordine:
+        prodotti scaduti -> quasi scaduti -> okay o senza scadenza
+
+LISTA SPESA
+( ) Gestione duplicati in lista
+( ) Aggiunta numero quantità nei prodotti
+( ) Se si barra il testo e lo cancelli il prodotto viene aggiunto in dispensa
+    con la relativa quantità (se già presente allora aggiungi solo la quantità)
+
+  * Aggiunta:
+    ( ) 2 tasti sotto a "Genera dal meal plan": tasti "seleziona tutti" e
+        "elimina tutti"
+
+MEAL PLAN
+( ) Mettere ordinamento per giorno della settimana (ordine da lunedì a domenica)
+
+STATISTICHE
+( ) Aggiungere lista dei prodotti scaduti
+( ) Eliminare tempo medio preparazione
+
+MEME
+( ) Mettere nella barra laterale una funzione finto a pagamento
+( ) Usare l'api "No-as-service"
