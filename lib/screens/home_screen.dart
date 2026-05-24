@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
-import 'recipes_screen.dart';
-import 'pantry_screen.dart';
-import 'meal_plan_screen.dart';
-import 'shopping_list.dart';
-import 'stats.dart';
+import 'main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void open(BuildContext context, Widget screen) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
-  }
-
   @override
   Widget build(BuildContext context) {
     final items = [
-      ['Ricette', Icons.restaurant_menu, const RecipesScreen()],
-      ['Dispensa', Icons.kitchen, const PantryScreen()],
-      ['Meal Plan', Icons.calendar_month, const MealPlanScreen()],
-      ['Lista Spesa', Icons.shopping_cart, const ShoppingListScreen()],
-      ['Statistiche', Icons.bar_chart, const StatsScreen()],
+      ['Ricette', Icons.restaurant_menu, 0],
+      ['Dispensa', Icons.kitchen, 1],
+      ['Meal Plan', Icons.calendar_month, 2],
+      ['Lista Spesa', Icons.shopping_cart, 3],
+      ['Statistiche', Icons.bar_chart, 4],
     ];
 
     return Scaffold(
@@ -37,7 +29,16 @@ class HomeScreen extends StatelessWidget {
             return Card(
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => open(context, items[index][2] as Widget),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MainScreen(
+                        initialIndex: items[index][2] as int,
+                      ),
+                    ),
+                  );
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

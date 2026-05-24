@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -56,9 +56,34 @@ class DatabaseHelper {
     int oldVersion,
     int newVersion,
   ) async {
-      if (oldVersion < 5) {
-        await db.delete('recipes');
-        await _insertDefaultRecipes(db);
+      if (oldVersion < 6) {
+        await db.update(
+          'recipes',
+          {'imagePath': 'assets/images/carbonara.jpg'},
+          where: 'name = ?',
+          whereArgs: ['Spaghetti alla Carbonara'],
+        );
+
+        await db.update(
+          'recipes',
+          {'imagePath': 'assets/images/pancakes.jpg'},
+          where: 'name = ?',
+          whereArgs: ['Pancakes'],
+        );
+
+        await db.update(
+          'recipes',
+          {'imagePath': 'assets/images/insalata_pollo.jpg'},
+          where: 'name = ?',
+          whereArgs: ['Insalata di pollo'],
+        );
+
+        await db.update(
+          'recipes',
+          {'imagePath': 'assets/images/pasta_pesto.jpg'},
+          where: 'name = ?',
+          whereArgs: ['Pasta al pesto'],
+        );
       }
     }
   
@@ -80,7 +105,7 @@ class DatabaseHelper {
           {'name': 'pepe', 'quantity': 1, 'unit': 'q.b.'},
         ]),
         'notes': 'Mescolare lontano dal fuoco per evitare effetto frittata.',
-        'imagePath': '../../assets/images/carbonara.jpg',
+        'imagePath': 'assets/images/carbonara.jpg',
         'isRecommended': 1,
         'isFavorite': 1,
       },
@@ -99,7 +124,7 @@ class DatabaseHelper {
           {'name': 'lievito', 'quantity': 1, 'unit': 'bustina'},
         ]),
         'notes': 'Servire con frutta o sciroppo.',
-        'imagePath': '../../assets/images/pancakes.jpg',
+        'imagePath': 'assets/images/pancakes.jpg',
         'isRecommended': 1,
         'isFavorite': 1,
       },
@@ -118,7 +143,7 @@ class DatabaseHelper {
           {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
         ]),
         'notes': 'Ottima per un pranzo leggero.',
-        'imagePath': '../../assets/images/insalata_pollo.jpg',
+        'imagePath': 'assets/images/insalata_pollo.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
@@ -136,7 +161,7 @@ class DatabaseHelper {
           {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
         ]),
         'notes': 'Aggiungere patate o fagiolini per una versione più ricca.',
-        'imagePath': '../../assets/images/pasta_pesto.jpg',
+        'imagePath': 'assets/images/pasta_pesto.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
