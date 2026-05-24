@@ -14,7 +14,16 @@ class StatsScreen extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Statistiche')),
+      appBar: AppBar(
+        title: const Text('Statistiche',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

@@ -37,7 +37,16 @@ class _PantryScreenState extends State<PantryScreen> {
     ).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Dispensa')),
+      appBar: AppBar(
+        title: const Text('Dispensa',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Padding(

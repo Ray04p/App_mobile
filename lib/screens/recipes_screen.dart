@@ -21,18 +21,28 @@ class _RecipesScreenState extends State<RecipesScreen> {
     final suggested = app.suggestedRecipes();
     final favorites = app.favoriteRecipes();
     final recipes = app.recipes.where((recipe) {
+      if (recipe.isRecommended){
+        return false;
+      }
       return recipe.name.toLowerCase().contains(search.toLowerCase()) ||
           recipe.category.toLowerCase().contains(search.toLowerCase());
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ricette')),
-      
-
+      appBar: AppBar(
+        title: const Text('Ricette',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),   
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
             child: Row(
               children: [
                 Expanded(
@@ -59,7 +69,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const RecipeFormScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const RecipeFormScreen(),
+                      ),
                     );
                   },
                 ),
@@ -67,9 +79,11 @@ class _RecipesScreenState extends State<RecipesScreen> {
             ),
           ),
 
+
+          //PREFERITE
           if (favorites.isNotEmpty) ...[
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.fromLTRB(12, 8, 12, 10),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -143,11 +157,15 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 18),
           ],
 
+
+
+          //CONSIGLIATE
           if (suggested.isNotEmpty) ...[
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.fromLTRB(12, 14, 12, 10),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -165,8 +183,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 itemBuilder: (context, index) {
                   final recipe = suggested[index];
 
-                  return SizedBox(
-                    width: 220,
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
@@ -182,11 +200,43 @@ class _RecipesScreenState extends State<RecipesScreen> {
                         );
                       },
                       child: Card(
-                        elevation: 3,
-                        child: ListTile(
-                          leading: const Icon(Icons.recommend),
-                          title: Text(recipe.name),
-                          subtitle: Text(recipe.category),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.recommend),
+
+                              const SizedBox(width: 10),
+
+                              Text(
+                                recipe.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  recipe.isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: recipe.isFavorite ? Colors.red : null,
+                                ),
+                                onPressed: () {
+                                  app.toggleFavoriteRecipe(recipe);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -194,11 +244,30 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 22),
           ],
+
+
+
+          //RICETTE DELL'UTENTE
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Le tue ricette',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: recipes.isEmpty
                 ? const Center(child: Text('Nessuna ricetta trovata'))
                 : ListView.builder(
+                    padding: const EdgeInsets.only(top: 4, bottom: 16),
                     itemCount: recipes.length,
                     itemBuilder: (context, index) {
                       final recipe = recipes[index];

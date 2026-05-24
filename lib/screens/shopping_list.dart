@@ -26,7 +26,16 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase())); //..sort "operatore cascata" crea e applicata
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Lista Spesa')),
+      appBar: AppBar(
+        title: const Text('Lista della spesa',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Padding(

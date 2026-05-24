@@ -46,7 +46,16 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     final app = Provider.of<AppState>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Meal Plan')),
+      appBar: AppBar(
+        title: const Text('Piano Alimentare',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),
       body: ReorderableListView(
         buildDefaultDragHandles: false,
         onReorder: (oldIndex, newIndex) {

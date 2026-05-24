@@ -15,7 +15,38 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('MealMate')),
+      appBar: AppBar(
+        toolbarHeight: 110,
+        centerTitle: true,
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'MealMate',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+                fontFamily: 'serif'
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'La tua cucina sempre sotto controllo.',
+              textAlign: TextAlign.center,
+              softWrap: true,
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+                fontFamily: 'serif'
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.builder(
@@ -42,13 +73,14 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(items[index][1] as IconData, size: 42),
+                    Icon(items[index][1] as IconData, size: 42, color: Colors.green[900]),
                     const SizedBox(height: 10),
                     Text(
                       items[index][0] as String,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 27, 94, 32),
                       ),
                     )
                   ],
