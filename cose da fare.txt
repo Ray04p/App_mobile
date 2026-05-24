@@ -2,7 +2,6 @@
 RICETTE
 ( ) Controllo dei numeri nel form
 ( ) Mostrare solo le ricette fattibili con gli ingredienti che abbiamo
-( ) Mostrare in un'altra lista tutte le ricette che abbiamo creato
 ( ) Filtri in base a vari criteri
 
   * Opzionale:
