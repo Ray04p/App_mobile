@@ -25,9 +25,10 @@ class PantryItem {
     return days >= 0 && days <= 3;
   }
 
-bool get isExpired {
+  bool get isExpired {
     if (expiryDate == null) return false;
-    return expiryDate!.isBefore(DateTime.now());
+    final days = expiryDate!.difference(DateTime.now()).inDays;
+    return days < 0;
   }
 
   Map<String, dynamic> toJson() => {

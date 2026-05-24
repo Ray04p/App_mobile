@@ -12,10 +12,6 @@ class StatsScreen extends StatelessWidget {
     final expiring = app.expiringItems();
     final expired = app.expiredItems();
 
-    final avgTime = app.recipes.isEmpty
-        ? 0
-        : app.recipes.map((e) => e.preparationTime).reduce((a, b) => a + b) ~/
-              app.recipes.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Statistiche')),
@@ -26,7 +22,6 @@ class StatsScreen extends StatelessWidget {
           statCard('Prodotti in dispensa', app.pantry.length.toString()),
           statCard('Pasti pianificati', app.mealPlan.length.toString()),
           statCard('Elementi lista spesa', app.shoppingList.length.toString()),
-          statCard('Tempo medio preparazione', '$avgTime min'),
           statCard('Prodotti vicini alla scadenza', expiring.length.toString()),
           statCard('Prodotti scaduti', expired.length.toString()),
 
@@ -38,6 +33,18 @@ class StatsScreen extends StatelessWidget {
           ...expiring.map(
             (item) => ListTile(
               leading: const Icon(Icons.warning, color: Colors.orange),
+              title: Text(item.name),
+              subtitle: Text('${item.quantity} ${item.unit}'),
+            ),
+          ),
+
+          const Text(
+            'Prodotti scaduti',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          ...expired.map(
+            (item) => ListTile(
+              leading: const Icon(Icons.warning, color: Colors.red),
               title: Text(item.name),
               subtitle: Text('${item.quantity} ${item.unit}'),
             ),

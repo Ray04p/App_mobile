@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/recipe.dart';
 import '../providers/app_state.dart';
@@ -24,6 +26,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
   late TextEditingController portions;
   late TextEditingController ingredients;
   late TextEditingController notes;
+  String? imagePath;
 
   @override
   void initState() {
@@ -39,6 +42,21 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     portions = TextEditingController(text: r?.portions.toString() ?? '');
     ingredients = TextEditingController(text: r?.ingredients.join(', ') ?? '');
     notes = TextEditingController(text: r?.notes ?? '');
+    imagePath = r?.imagePath;
+  }
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (image != null) {
+      setState(() {
+        imagePath = image.path;
+      });
+    }
   }
 
   Future<void> save() async {
@@ -58,6 +76,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
           .where((e) => e.isNotEmpty)
           .toList(),
       notes: notes.text.trim(),
+      imagePath: imagePath,
       isRecommended: widget.recipe?.isRecommended ?? false,
       isFavorite: widget.recipe?.isFavorite ?? false,
     );
@@ -74,7 +93,6 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
-      print('ERRORE SALVATAGGIO RICETTA: $e');
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -135,6 +153,18 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
             field('Ingredienti separati da virgola', ingredients, maxLines: 3),
             field('Note', notes, maxLines: 2,
               validator: (value) => null,),
+
+           
+
+            const SizedBox(height: 12),
+
+            OutlinedButton.icon(
+              onPressed: pickImage,
+              icon: const Icon(Icons.image),
+              label: Text(
+                imagePath == null ? 'Aggiungi foto ricetta' : 'Cambia foto',
+              ),
+            ),
             
             const SizedBox(height: 8),
             ElevatedButton.icon(

@@ -23,7 +23,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -41,6 +41,7 @@ class DatabaseHelper {
         portions INTEGER NOT NULL,
         ingredients TEXT NOT NULL,
         notes TEXT,
+        imagePath TEXT,
         isRecommended INTEGER NOT NULL DEFAULT 0,
         isFavorite INTEGER NOT NULL DEFAULT 0
       )
@@ -54,13 +55,33 @@ class DatabaseHelper {
     int oldVersion,
     int newVersion,
   ) async {
-    if (oldVersion < 2) {
-      await db.execute(
-        'ALTER TABLE recipes ADD COLUMN isRecommended INTEGER NOT NULL DEFAULT 0',
+        if (oldVersion < 4) {
+      await db.update(
+        'recipes',
+        {'imagePath': 'assets/images/carbonara.jpg'},
+        where: 'name = ?',
+        whereArgs: ['Spaghetti alla Carbonara'],
       );
 
-      await db.execute(
-        'ALTER TABLE recipes ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0',
+      await db.update(
+        'recipes',
+        {'imagePath': 'assets/images/pancakes.jpg'},
+        where: 'name = ?',
+        whereArgs: ['Pancakes'],
+      );
+
+      await db.update(
+        'recipes',
+        {'imagePath': 'assets/images/insalata_pollo.jpg'},
+        where: 'name = ?',
+        whereArgs: ['Insalata di pollo'],
+      );
+
+      await db.update(
+        'recipes',
+        {'imagePath': 'assets/images/pasta_pesto.jpg'},
+        where: 'name = ?',
+        whereArgs: ['Pasta al pesto'],
       );
     }
   }
@@ -76,6 +97,7 @@ class DatabaseHelper {
         'portions': 2,
         'ingredients': 'spaghetti,uova,pecorino,guanciale,pepe',
         'notes': 'Mescolare lontano dal fuoco per evitare effetto frittata.',
+        'imagePath': '../../assets/images/carbonara.jpg',
         'isRecommended': 1,
         'isFavorite': 1,
       },
@@ -88,6 +110,7 @@ class DatabaseHelper {
         'portions': 4,
         'ingredients': 'farina,latte,uova,zucchero,lievito',
         'notes': 'Servire con frutta o sciroppo.',
+        'imagePath': '../../assets/images/pancakes.jpg',
         'isRecommended': 1,
         'isFavorite': 1,
       },
@@ -100,6 +123,7 @@ class DatabaseHelper {
         'portions': 2,
         'ingredients': 'pollo,insalata,pomodorini,mais,olio',
         'notes': 'Ottima per un pranzo leggero.',
+        'imagePath': '../../assets/images/insalata_pollo.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
@@ -112,6 +136,7 @@ class DatabaseHelper {
         'portions': 2,
         'ingredients': 'pasta,pesto,parmigiano,olio',
         'notes': 'Aggiungere patate o fagiolini per una versione più ricca.',
+        'imagePath': '../../assets/images/pasta_pesto.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },

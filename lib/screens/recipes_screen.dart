@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'recipe_detail_screen.dart';
 import '../providers/app_state.dart';
 import 'recipe_form_screen.dart';
 
@@ -94,7 +95,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => RecipeFormScreen(recipe: recipe),
+                            builder: (_) => RecipeDetailScreen(recipeId: recipe.id!),
                           ),
                         );
                       },
@@ -150,7 +151,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Ricette consigliate dalla tua dispensa',
+                  'Ricette consigliate da noi',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -166,11 +167,27 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
                   return SizedBox(
                     width: 220,
-                    child: Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.recommend),
-                        title: Text(recipe.name),
-                        subtitle: Text(recipe.category),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        if (recipe.id == null) return;
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RecipeDetailScreen(
+                              recipeId: recipe.id!,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 3,
+                        child: ListTile(
+                          leading: const Icon(Icons.recommend),
+                          title: Text(recipe.name),
+                          subtitle: Text(recipe.category),
+                        ),
                       ),
                     ),
                   );
@@ -225,7 +242,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    RecipeFormScreen(recipe: recipe),
+                                    RecipeDetailScreen(recipeId: recipe.id!),
                               ),
                             );
                           },

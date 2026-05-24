@@ -8,6 +8,7 @@ class Recipe {
   int portions;
   List<String> ingredients;
   String notes;
+  String? imagePath;
   bool isRecommended;
   bool isFavorite;
 
@@ -21,6 +22,7 @@ class Recipe {
     required this.portions,
     required this.ingredients,
     this.notes = '',
+    this.imagePath,
     this.isRecommended = false,
     this.isFavorite = false,
   });
@@ -36,6 +38,7 @@ class Recipe {
       'portions': portions,
       'ingredients': ingredients.join(','),
       'notes': notes,
+      'imagePath': imagePath,
       'isRecommended': isRecommended ? 1 : 0,
       'isFavorite': isFavorite ? 1 : 0,
     };
@@ -57,6 +60,7 @@ class Recipe {
           .where((e) => e.isNotEmpty)
           .toList(),
       notes: map['notes'] ?? '',
+      imagePath: map['imagePath'],
       isRecommended: map['isRecommended'] == 1,
       isFavorite: map['isFavorite'] == 1,
     );
