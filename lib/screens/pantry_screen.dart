@@ -163,7 +163,7 @@ class _PantryScreenState extends State<PantryScreen> {
                     '${item.expiryDate != null ? ' • ${item.isExpired ? 'Scaduto' : 'Scade'}: ${DateFormat('dd/MM/yyyy').format(item.expiryDate!)}' : ''}',
                   ),
                   leading: CircleAvatar(
-                    backgroundColor: color.withOpacity(0.15),
+                    backgroundColor: color,
                     child: Icon(icon, color: color),
                   ),
                   trailing: IconButton(
