@@ -3,15 +3,11 @@ RICETTE
 ( ) Controllo dei numeri nel form
 ( ) Mostrare solo le ricette fattibili con gli ingredienti che abbiamo
 ( ) Mostrare in un'altra lista tutte le ricette che abbiamo creato
+( ) Filtri in base a vari criteri
 
   * Opzionale:
     ( ) Mettere anche gli spuntini
 
-DISPENSA
-( ) Filtri in base a vari criteri
-    O più semplice:
-    ( ) Ordinamento in base alfabetico e in ordine:
-        prodotti scaduti -> quasi scaduti -> okay o senza scadenza
 
 LISTA SPESA
 ( ) Gestione duplicati in lista
@@ -26,9 +22,6 @@ LISTA SPESA
 MEAL PLAN
 ( ) Mettere ordinamento per giorno della settimana (ordine da lunedì a domenica)
 
-STATISTICHE
-( ) Aggiungere lista dei prodotti scaduti
-( ) Eliminare tempo medio preparazione
 
 MEME
 ( ) Mettere nella barra laterale una funzione finto a pagamento
