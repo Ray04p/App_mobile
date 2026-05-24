@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/recipe.dart';
 import '../models/ingredients.dart';
 import '../providers/app_state.dart';
+import 'package:flutter/services.dart';
 
 class RecipeFormScreen extends StatefulWidget {
   final Recipe? recipe;
@@ -143,10 +144,16 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
       child: TextFormField(
         controller: controller,
         keyboardType: type,
+        inputFormatters: type == TextInputType.number
+        ? [FilteringTextInputFormatter.digitsOnly]
+        : null,
         textInputAction: action, //per andare da capo
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
+          hintText: type == TextInputType.number
+          ? 'Inserisci un numero'
+          : null,
 
           labelStyle: const TextStyle(
             fontSize: 16,
@@ -169,11 +176,17 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
           ),
         ),
         validator: validator ?? (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Campo obbligatorio';
-          }
-          return null;
-        },
+        if (value == null || value.trim().isEmpty) {
+          return 'Campo obbligatorio';
+        }
+
+        if (type == TextInputType.number &&
+            int.tryParse(value.trim()) == null) {
+          return 'Inserisci un numero valido';
+        }
+
+        return null;
+      },
       ),
     );
   }

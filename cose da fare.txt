@@ -1,6 +1,6 @@
 
 RICETTE
-( ) Controllo dei numeri nel form
+( ) Controllo dei numeri nel form (ho messo che in "porzioni" puoi mettere solo un intero")
 ( ) Mostrare solo le ricette fattibili con gli ingredienti che abbiamo
 ( ) Filtri in base a vari criteri
 
