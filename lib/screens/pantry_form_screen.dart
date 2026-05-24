@@ -111,7 +111,7 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
     String? Function(String?)? validator,}) {
       
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
         controller: controller,
         keyboardType: type,

@@ -27,6 +27,8 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
   late TextEditingController ingredients;
   late TextEditingController notes;
   String? imagePath;
+  int selectedHours = 0;
+  int selectedMinutes = 0;
 
   @override
   void initState() {
@@ -37,7 +39,10 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     name = TextEditingController(text: r?.name ?? '');
     description = TextEditingController(text: r?.description ?? '');
     category = TextEditingController(text: r?.category ?? '');
-    time = TextEditingController(text: r?.preparationTime.toString() ?? '');
+    final totalMinutes = r?.preparationTime ?? 0;
+    selectedHours = totalMinutes ~/ 60;
+    selectedMinutes = totalMinutes % 60;
+    time = TextEditingController(text: totalMinutes.toString());
     difficulty = TextEditingController(text: r?.difficulty ?? '');
     portions = TextEditingController(text: r?.portions.toString() ?? '');
     ingredients = TextEditingController(
@@ -69,7 +74,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
       name: name.text.trim(),
       description: description.text.trim(),
       category: category.text.trim(),
-      preparationTime: int.tryParse(time.text.trim()) ?? 0,
+      preparationTime: (selectedHours * 60) + selectedMinutes,
       difficulty: difficulty.text.trim(),
       portions: int.tryParse(portions.text.trim()) ?? 1,
       ingredients: ingredients.text
@@ -134,7 +139,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     String? Function(String?)? validator}) {
     
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
         controller: controller,
         keyboardType: type,
@@ -142,7 +147,26 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+
+          labelStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+
+          floatingLabelStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 18,
+          ),
+
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         validator: validator ?? (value) {
           if (value == null || value.trim().isEmpty) {
@@ -160,7 +184,14 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Modifica ricetta' : 'Nuova ricetta'),
+        title: Text(isEdit ? 'Modifica ricetta' : 'Nuova ricetta',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
       ),
       body: Form(
         key: formKey,
@@ -170,8 +201,119 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
             field('Nome', name),
             field('Descrizione / procedimento', description, maxLines: 4),
             field('Categoria', category),
-            field('Tempo preparazione', time, type: TextInputType.number),
-            field('Difficoltà', difficulty),
+
+
+            //TEMPO DI PREPARAZIONE
+            const SizedBox(height: 10),
+            const Text(
+              'Tempo di preparazione',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    initialValue: selectedHours,
+                    decoration: const InputDecoration(
+                      labelText: 'Ore',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: List.generate(
+                      13,
+                      (index) => DropdownMenuItem(
+                        value: index,
+                        child: Text('$index h'),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedHours = value ?? 0;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    initialValue: selectedMinutes,
+                    decoration: const InputDecoration(
+                      labelText: 'Minuti',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+                        .map(
+                          (m) => DropdownMenuItem(
+                            value: m,
+                            child: Text('$m min'),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedMinutes = value ?? 0;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 25),
+
+
+
+            //DIFFICOLTA'
+              const Text(
+                'Difficoltà',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Facile'),
+                    selected: difficulty.text == 'Facile',
+                    onSelected: (_) {
+                      setState(() {
+                        difficulty.text = 'Facile';
+                      });
+                    },
+                  ),
+
+                  ChoiceChip(
+                    label: const Text('Media'),
+                    selected: difficulty.text == 'Media',
+                    onSelected: (_) {
+                      setState(() {
+                        difficulty.text = 'Media';
+                      });
+                    },
+                  ),
+
+                  ChoiceChip(
+                    label: const Text('Difficile'),
+                    selected: difficulty.text == 'Difficile',
+                    onSelected: (_) {
+                      setState(() {
+                        difficulty.text = 'Difficile';
+                      });
+                    },
+                  ),
+                ],
+                
+              ),
+            const SizedBox(height: 30),
+
+
+
             field('Porzioni', portions, type: TextInputType.number),
             field('Ingredienti: es. 200 g pasta, 2 pz uova',
               ingredients,
@@ -183,7 +325,6 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
            
 
             const SizedBox(height: 12),
-
             OutlinedButton.icon(
               onPressed: pickImage,
               icon: const Icon(Icons.image),
@@ -192,7 +333,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
               ),
             ),
             
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () async {
                 await save();
