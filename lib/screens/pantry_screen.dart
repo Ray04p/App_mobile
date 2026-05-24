@@ -36,6 +36,32 @@ class _PantryScreenState extends State<PantryScreen> {
       (e) => !e.isExpired && !e.isExpiringSoon,
     ).toList();
 
+    expired.sort((a, b) {
+      if (a.expiryDate == null && b.expiryDate == null) return 0;
+      if (a.expiryDate == null) return 1;
+      if (b.expiryDate == null) return -1;
+
+      return a.expiryDate!.compareTo(b.expiryDate!);
+    });
+
+    expiring.sort((a, b) {
+      if (a.expiryDate == null && b.expiryDate == null) return 0;
+      if (a.expiryDate == null) return 1;
+      if (b.expiryDate == null) return -1;
+
+      return a.expiryDate!.compareTo(b.expiryDate!);
+    });
+
+    others.sort((a, b) {
+      if (a.expiryDate == null && b.expiryDate == null) return 0;
+      if (a.expiryDate == null) return 1;
+      if (b.expiryDate == null) return -1;
+
+      return a.expiryDate!.compareTo(b.expiryDate!);
+    });
+
+    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dispensa',
