@@ -128,7 +128,7 @@ class RecipeDetailScreen extends StatelessWidget {
                           const Text('• ', style: TextStyle(fontSize: 18)),
                           Expanded(
                             child: Text(
-                              ingredient,
+                              ingredient.displayText,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),

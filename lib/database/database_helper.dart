@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/recipe.dart';
+import 'dart:convert';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -23,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -55,36 +56,12 @@ class DatabaseHelper {
     int oldVersion,
     int newVersion,
   ) async {
-        if (oldVersion < 4) {
-      await db.update(
-        'recipes',
-        {'imagePath': 'assets/images/carbonara.jpg'},
-        where: 'name = ?',
-        whereArgs: ['Spaghetti alla Carbonara'],
-      );
-
-      await db.update(
-        'recipes',
-        {'imagePath': 'assets/images/pancakes.jpg'},
-        where: 'name = ?',
-        whereArgs: ['Pancakes'],
-      );
-
-      await db.update(
-        'recipes',
-        {'imagePath': 'assets/images/insalata_pollo.jpg'},
-        where: 'name = ?',
-        whereArgs: ['Insalata di pollo'],
-      );
-
-      await db.update(
-        'recipes',
-        {'imagePath': 'assets/images/pasta_pesto.jpg'},
-        where: 'name = ?',
-        whereArgs: ['Pasta al pesto'],
-      );
+      if (oldVersion < 5) {
+        await db.delete('recipes');
+        await _insertDefaultRecipes(db);
+      }
     }
-  }
+  
 
   Future<void> _insertDefaultRecipes(Database db) async {
     final defaultRecipes = [
@@ -95,7 +72,13 @@ class DatabaseHelper {
         'preparationTime': 25,
         'difficulty': 'Media',
         'portions': 2,
-        'ingredients': 'spaghetti,uova,pecorino,guanciale,pepe',
+        'ingredients': jsonEncode([
+          {'name': 'spaghetti', 'quantity': 200, 'unit': 'g'},
+          {'name': 'uova', 'quantity': 2, 'unit': 'pz'},
+          {'name': 'pecorino', 'quantity': 50, 'unit': 'g'},
+          {'name': 'guanciale', 'quantity': 100, 'unit': 'g'},
+          {'name': 'pepe', 'quantity': 1, 'unit': 'q.b.'},
+        ]),
         'notes': 'Mescolare lontano dal fuoco per evitare effetto frittata.',
         'imagePath': '../../assets/images/carbonara.jpg',
         'isRecommended': 1,
@@ -108,7 +91,13 @@ class DatabaseHelper {
         'preparationTime': 15,
         'difficulty': 'Facile',
         'portions': 4,
-        'ingredients': 'farina,latte,uova,zucchero,lievito',
+        'ingredients': jsonEncode([
+          {'name': 'farina', 'quantity': 200, 'unit': 'g'},
+          {'name': 'latte', 'quantity': 250, 'unit': 'ml'},
+          {'name': 'uova', 'quantity': 2, 'unit': 'pz'},
+          {'name': 'zucchero', 'quantity': 30, 'unit': 'g'},
+          {'name': 'lievito', 'quantity': 1, 'unit': 'bustina'},
+        ]),
         'notes': 'Servire con frutta o sciroppo.',
         'imagePath': '../../assets/images/pancakes.jpg',
         'isRecommended': 1,
@@ -121,7 +110,13 @@ class DatabaseHelper {
         'preparationTime': 20,
         'difficulty': 'Facile',
         'portions': 2,
-        'ingredients': 'pollo,insalata,pomodorini,mais,olio',
+        'ingredients': jsonEncode([
+          {'name': 'pollo', 'quantity': 250, 'unit': 'g'},
+          {'name': 'insalata', 'quantity': 100, 'unit': 'g'},
+          {'name': 'pomodorini', 'quantity': 8, 'unit': 'pz'},
+          {'name': 'mais', 'quantity': 80, 'unit': 'g'},
+          {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
+        ]),
         'notes': 'Ottima per un pranzo leggero.',
         'imagePath': '../../assets/images/insalata_pollo.jpg',
         'isRecommended': 1,
@@ -134,7 +129,12 @@ class DatabaseHelper {
         'preparationTime': 15,
         'difficulty': 'Facile',
         'portions': 2,
-        'ingredients': 'pasta,pesto,parmigiano,olio',
+        'ingredients': jsonEncode([
+          {'name': 'pasta', 'quantity': 200, 'unit': 'g'},
+          {'name': 'pesto', 'quantity': 80, 'unit': 'g'},
+          {'name': 'parmigiano', 'quantity': 30, 'unit': 'g'},
+          {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
+        ]),
         'notes': 'Aggiungere patate o fagiolini per una versione più ricca.',
         'imagePath': '../../assets/images/pasta_pesto.jpg',
         'isRecommended': 1,

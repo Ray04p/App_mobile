@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/recipe.dart';
+import '../models/ingredients.dart';
 import '../providers/app_state.dart';
 
 class RecipeFormScreen extends StatefulWidget {
@@ -39,7 +40,9 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
     time = TextEditingController(text: r?.preparationTime.toString() ?? '');
     difficulty = TextEditingController(text: r?.difficulty ?? '');
     portions = TextEditingController(text: r?.portions.toString() ?? '');
-    ingredients = TextEditingController(text: r?.ingredients.join(', ') ?? '');
+    ingredients = TextEditingController(
+      text: r?.ingredients.map((e) => e.displayText).join(', ') ?? '',
+    );
     notes = TextEditingController(text: r?.notes ?? '');
     imagePath = r?.imagePath;
   }
@@ -70,15 +73,36 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
       difficulty: difficulty.text.trim(),
       portions: int.tryParse(portions.text.trim()) ?? 1,
       ingredients: ingredients.text
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList(),
-      notes: notes.text.trim(),
-      imagePath: imagePath,
-      isRecommended: widget.recipe?.isRecommended ?? false,
-      isFavorite: widget.recipe?.isFavorite ?? false,
-    );
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .map((e) {
+          final parts = e.split(' ');
+
+          if (parts.length >= 3) {
+            final quantity = double.tryParse(parts[0]) ?? 1;
+            final unit = parts[1];
+            final name = parts.sublist(2).join(' ');
+
+            return RecipeIngredient(
+              name: name,
+              quantity: quantity,
+              unit: unit,
+            );
+          }
+
+          return RecipeIngredient(
+            name: e,
+            quantity: 1,
+            unit: 'pz',
+          );
+        })
+        .toList(),
+          notes: notes.text.trim(),
+          imagePath: imagePath,
+          isRecommended: widget.recipe?.isRecommended ?? false,
+          isFavorite: widget.recipe?.isFavorite ?? false,
+        );
 
     final app = Provider.of<AppState>(context, listen: false);
 
@@ -149,7 +173,10 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
             field('Tempo preparazione', time, type: TextInputType.number),
             field('Difficoltà', difficulty),
             field('Porzioni', portions, type: TextInputType.number),
-            field('Ingredienti separati da virgola', ingredients, maxLines: 3),
+            field('Ingredienti: es. 200 g pasta, 2 pz uova',
+              ingredients,
+              maxLines: 3,
+            ),
             field('Note', notes, maxLines: 2,
               validator: (value) => null,),
 

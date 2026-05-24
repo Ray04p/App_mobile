@@ -222,7 +222,7 @@ class AppState extends ChangeNotifier {
       if (recipe == null) continue;
 
       for (final ingredient in recipe.ingredients) {
-        final ingredientName = ingredient.toLowerCase().trim();
+        final ingredientName = ingredient.name.toLowerCase().trim();
 
         final alreadyInPantry = pantryNames.contains(ingredientName);
 
@@ -234,7 +234,7 @@ class AppState extends ChangeNotifier {
           shoppingList.add(
             ShoppingItem(
               id: DateTime.now().microsecondsSinceEpoch.toString(),
-              name: ingredient,
+              name: ingredient.displayText,
             ),
           );
         }
@@ -250,8 +250,18 @@ class AppState extends ChangeNotifier {
   // -------------------------
 
   List<Recipe> suggestedRecipes() {
-    return recipes.where((recipe) => recipe.isRecommended).toList();
+    return recipes.where((recipe) {
+      return recipe.isRecommended ||
+          recipe.ingredients.any((ingredient) {
+            return pantry.any(
+              (item) =>
+                  item.name.toLowerCase().trim() ==
+                  ingredient.name.toLowerCase().trim(),
+            );
+          });
+    }).toList();
   }
+  
 
   List<PantryItem> expiringItems() {
     return pantry.where((item) => item.isExpiringSoon).toList();

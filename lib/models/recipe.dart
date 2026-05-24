@@ -1,3 +1,6 @@
+import 'ingredients.dart';
+import 'dart:convert';
+
 class Recipe {
   int? id;
   String name;
@@ -6,7 +9,7 @@ class Recipe {
   int preparationTime;
   String difficulty;
   int portions;
-  List<String> ingredients;
+  List<RecipeIngredient> ingredients;
   String notes;
   String? imagePath;
   bool isRecommended;
@@ -36,7 +39,9 @@ class Recipe {
       'preparationTime': preparationTime,
       'difficulty': difficulty,
       'portions': portions,
-      'ingredients': ingredients.join(','),
+      'ingredients': jsonEncode(
+        ingredients.map((e) => e.toJson()).toList(),
+      ),
       'notes': notes,
       'imagePath': imagePath,
       'isRecommended': isRecommended ? 1 : 0,
@@ -53,12 +58,9 @@ class Recipe {
       preparationTime: map['preparationTime'],
       difficulty: map['difficulty'],
       portions: map['portions'],
-      ingredients: map['ingredients']
-          .toString()
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList(),
+      ingredients: (jsonDecode(map['ingredients']) as List)
+        .map((e) => RecipeIngredient.fromJson(e))
+        .toList(),
       notes: map['notes'] ?? '',
       imagePath: map['imagePath'],
       isRecommended: map['isRecommended'] == 1,
