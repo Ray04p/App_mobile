@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
+import 'favorite_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,6 +9,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       ['Ricette', Icons.restaurant_menu, 0],
+      ['Preferite', Icons.favorite, -1],
       ['Dispensa', Icons.kitchen, 1],
       ['Meal Plan', Icons.calendar_month, 2],
       ['Lista Spesa', Icons.shopping_cart, 3],
@@ -61,11 +63,23 @@ class HomeScreen extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () {
+                  final selectedIndex = items[index][2] as int;
+
+                  if (selectedIndex == -1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FavoriteRecipesScreen(),
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => MainScreen(
-                        initialIndex: items[index][2] as int,
+                        initialIndex: selectedIndex,
                       ),
                     ),
                   );
