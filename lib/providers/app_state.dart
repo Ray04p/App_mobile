@@ -234,6 +234,24 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  void selectAllShoppingItems() {
+    for (final item in shoppingList) {
+      item.purchased = true;
+    }
+
+    saveData();
+    notifyListeners();
+  }
+
+  void deleteSelectedShoppingItems() {
+    shoppingList.removeWhere((item) => item.purchased);
+
+    saveData();
+    notifyListeners();
+  }
+
+
   void generateShoppingListFromMealPlan() {
     final pantryNames = pantry
         .map((item) => item.name.toLowerCase().trim())

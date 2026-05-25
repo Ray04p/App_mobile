@@ -132,6 +132,39 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               label: const Text('Genera dal meal plan'),
             ),
           ),
+
+
+          //"SELEZIONA/ELIMINA"
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: app.shoppingList.isEmpty
+                        ? null
+                        : app.selectAllShoppingItems,
+                    icon: const Icon(Icons.select_all),
+                    label: const Text('Seleziona tutti'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: app.shoppingList.any((item) => item.purchased)
+                        ? app.deleteSelectedShoppingItems
+                        : null,
+                    icon: const Icon(Icons.delete_sweep),
+                    label: const Text('Elimina selezionati'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+
+          //LISTA
           Expanded(
             child: sortedList.isEmpty
                 ? const Center(child: Text('Lista vuota'))
@@ -152,7 +185,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         value: item.purchased,
                         onChanged: (_) => app.toggleShoppingItem(item.id),
                         secondary: IconButton(
-                          icon: const Icon(Icons.delete),
+                          icon: const Icon(Icons.delete, color: Color.fromARGB(255, 29, 102, 34),),
                           onPressed: () => app.deleteShoppingItem(item.id),
                         ),
                       );

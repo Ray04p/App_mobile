@@ -5,14 +5,8 @@ RICETTE
 
 
 LISTA SPESA
-( ) Gestione duplicati in lista
-( ) Aggiunta numero quantità nei prodotti
-( ) Se si barra il testo e lo cancelli il prodotto viene aggiunto in dispensa
-    con la relativa quantità (se già presente allora aggiungi solo la quantità)
+( ) Aggiunta in dispensa del prodotto quando lo si elimina
 
-  * Aggiunta:
-    ( ) 2 tasti sotto a "Genera dal meal plan": tasti "seleziona tutti" e
-        "elimina tutti"
 
 
 
