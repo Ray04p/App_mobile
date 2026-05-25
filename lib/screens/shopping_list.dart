@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import '../models/pantry_item.dart';
 import '../providers/app_state.dart';
 
 class ShoppingListScreen extends StatefulWidget {
@@ -186,7 +186,13 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         onChanged: (_) => app.toggleShoppingItem(item.id),
                         secondary: IconButton(
                           icon: const Icon(Icons.delete, color: Color.fromARGB(255, 29, 102, 34),),
-                          onPressed: () => app.deleteShoppingItem(item.id),
+                          onPressed: () {
+                            showAddToPantryDialog(
+                              context,
+                              app,
+                              item,
+                            );
+                          },
                         ),
                       );
                     },
@@ -196,4 +202,136 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       ),
     );
   }
+
+
+
+
+
+
+
+
+  Future<void> showAddToPantryDialog(
+    BuildContext context,
+    AppState app,
+    dynamic item,
+  ) async {
+    final categoryController = TextEditingController();
+    final notesController = TextEditingController();
+
+    DateTime expiryDate = DateTime.now().add(
+      const Duration(days: 7),
+    );
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text(
+                'Aggiungere in dispensa?',
+              ),
+
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    TextField(
+                      controller: categoryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Categoria',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    TextField(
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Note',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        'Data di scadenza',
+                      ),
+                      subtitle: Text(
+                        '${expiryDate.day}/${expiryDate.month}/${expiryDate.year}',
+                      ),
+                      trailing: const Icon(Icons.calendar_month),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                          initialDate: expiryDate,
+                        );
+
+                        if (picked != null) {
+                          setDialogState(() {
+                            expiryDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    app.deleteShoppingItem(item.id);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Solo elimina'),
+                ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    app.addPantryItem(
+                      PantryItem(
+                        id: DateTime.now().microsecondsSinceEpoch.toString(),
+                        name: item.name,
+                        category: categoryController.text.trim().isEmpty
+                            ? 'Altro'
+                            : categoryController.text.trim(),
+                        quantity: 1,
+                        unit: 'pz',
+                        expiryDate: expiryDate,
+                        notes: notesController.text.trim(),
+                      ),
+                    );
+
+                    app.deleteShoppingItem(item.id);
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Aggiungi',
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
+

@@ -4,12 +4,6 @@ RICETTE
 () possibilità di eliminare le  ricette
 
 
-LISTA SPESA
-( ) Aggiunta in dispensa del prodotto quando lo si elimina
-
-
-
-
 
 MEME
 ( ) Mettere nella barra laterale una funzione finto a pagamento
