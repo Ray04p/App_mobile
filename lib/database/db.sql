@@ -8,7 +8,8 @@ CREATE TABLE recipes (
   portions INTEGER NOT NULL,
   ingredients TEXT NOT NULL,
   notes TEXT,
-  isRecommended INTEGER NOT NULL DEFAULT 0
+  imagePath TEXT,
+  isRecommended INTEGER NOT NULL DEFAULT 0,
   isFavorite INTEGER NOT NULL DEFAULT 0
 );
 
