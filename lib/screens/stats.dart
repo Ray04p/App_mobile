@@ -34,7 +34,7 @@ class StatsScreen extends StatelessWidget {
           statCard('Prodotti vicini alla scadenza', expiring.length.toString()),
           statCard('Prodotti scaduti', expired.length.toString()),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 30),
           const Text(
             'Prodotti in scadenza',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -47,6 +47,8 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
 
+
+          const SizedBox(height: 16),
           const Text(
             'Prodotti scaduti',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -59,6 +61,8 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
 
+
+          const SizedBox(height: 16),
           Card(
             color: Colors.red.shade50,
             child: ListTile(
