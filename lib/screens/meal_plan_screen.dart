@@ -26,7 +26,12 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     'Domenica',
   ];
 
-  final meals = ['Colazione', 'Pranzo', 'Cena', 'Spuntino'];
+  final meals = [
+    'Colazione',
+    'Pranzo',
+    'Cena',
+    'Spuntino',
+  ];
 
   void addMeal(AppState app) {
     if (selectedRecipeId == null) return;
@@ -46,118 +51,244 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     final app = Provider.of<AppState>(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FBF2),
+
       appBar: AppBar(
-        title: const Text('Piano Alimentare',
+        title: const Text(
+          'Meal Plan',
           style: TextStyle(
             fontSize: 25,
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 29, 102, 34),
-            fontFamily: 'serif'
+            fontFamily: 'serif',
           ),
         ),
       ),
-      body: ReorderableListView(
-        buildDefaultDragHandles: false,
-        onReorder: (oldIndex, newIndex) {
-          app.reorderMealPlanItems(oldIndex, newIndex);
-        },
 
-        header: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: selectedDay,
-                decoration: const InputDecoration(
-                  labelText: 'Giorno',
-                  border: OutlineInputBorder(),
-                ),
-                items: days
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) => setState(() => selectedDay = value!),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: selectedMeal,
-                decoration: const InputDecoration(
-                  labelText: 'Pasto',
-                  border: OutlineInputBorder(),
-                ),
-                items: meals
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) => setState(() => selectedMeal = value!),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: selectedRecipeId,
-                decoration: const InputDecoration(
-                  labelText: 'Ricetta',
-                  border: OutlineInputBorder(),
-                ),
-                items: app.recipes
-                    .map(
-                      (r) => DropdownMenuItem(
-                        value: r.id.toString(),
-                        child: Text(r.name),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => selectedRecipeId = value),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => addMeal(app),
-                icon: const Icon(Icons.add),
-                label: const Text('Aggiungi al piano'),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Pasti pianificati',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-
-        //parte modificabile 
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
-          for (int i = 0; i < app.mealPlan.length; i++)
-            Card(
-              key: ValueKey(
-                app.mealPlan[i].id,
-              ), // La chiave univoca vitale per Flutter
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: ListTile(
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Aggiungi un pasto',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[900],
+                    fontFamily: 'serif',
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                DropdownButtonFormField<String>(
+                  initialValue: selectedDay,
+                  decoration: InputDecoration(
+                    labelText: 'Giorno',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  items: days
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(e),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDay = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 14),
+
+                DropdownButtonFormField<String>(
+                  initialValue: selectedMeal,
+                  decoration: InputDecoration(
+                    labelText: 'Pasto',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  items: meals
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(e),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedMeal = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 14),
+
+                DropdownButtonFormField<String>(
+                  initialValue: selectedRecipeId,
+                  decoration: InputDecoration(
+                    labelText: 'Ricetta',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  items: app.recipes
+                      .map(
+                        (r) => DropdownMenuItem(
+                          value: r.id.toString(),
+                          child: Text(r.name),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRecipeId = value;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 18),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => addMeal(app),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Aggiungi al piano'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          Text(
+            'La tua settimana',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[900],
+              fontFamily: 'serif',
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          
+          ...days.map((day) {
+            final dayMeals = app.mealPlan.where((item) => item.day == day).toList();
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 26),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: ExpansionTile(
+                tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
                 title: Text(
-                  '${app.mealPlan[i].day} - ${app.mealPlan[i].mealType}',
+                  day,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[900],
+                    fontFamily: 'serif',
+                  ),
                 ),
                 subtitle: Text(
-                  app.recipeById(app.mealPlan[i].recipeId)?.name ??
-                      'Ricetta eliminata',
+                  '${dayMeals.length} pasti pianificati',
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ReorderableDragStartListener(
-                      index: i, // L'indice esatto della riga
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Icon(Icons.drag_handle, color: Colors.grey),
+                children: [
+                  ...meals.map((mealType) {
+                    final meal = dayMeals.where((m) => m.mealType == mealType);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            mealType,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange[800],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          if (meal.isEmpty)
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 202, 227, 202),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Text('Nessun pasto pianificato'),
+                            )
+                          else
+                            ...meal.map((item) {
+                              final recipe = app.recipeById(item.recipeId);
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF6F8F1),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.green.shade100,
+                                    child: Icon(
+                                      Icons.restaurant,
+                                      color: Colors.green[900],
+                                    ),
+                                  ),
+                                  title: Text(
+                                    recipe?.name ?? 'Ricetta eliminata',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      app.deleteMealPlanItem(item.id);
+                                    },
+                                  ),
+                                ),
+                              );
+                            }),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () =>
-                          app.deleteMealPlanItem(app.mealPlan[i].id),
-                    ),
-                  ],
-                ),
+                    );
+                  }),
+                ],
               ),
-            ),
+            );
+          }),
         ],
       ),
     );

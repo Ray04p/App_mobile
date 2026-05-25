@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meal_planner_project/screens/favorite_screen.dart';
 import 'package:provider/provider.dart';
-import 'recipes_screen.dart';
 import '../providers/app_state.dart';
 
 class StatsScreen extends StatelessWidget {
