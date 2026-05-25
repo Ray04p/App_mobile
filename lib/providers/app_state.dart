@@ -183,13 +183,36 @@ class AppState extends ChangeNotifier {
   // LISTA SPESA
   // -------------------------
 
-  void addShoppingItem(String name) {
-    shoppingList.add(
-      ShoppingItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: name,
-      ),
+  void addShoppingItem(String name, {double quantity = 0, String unit = ''}) {
+    final normalizedName = name.toLowerCase().trim();
+    final normalizedUnit = unit.toLowerCase().trim();
+    final existingIndex = shoppingList.indexWhere(
+      (item) =>
+          item.name.toLowerCase().trim() == normalizedName &&
+          item.unit.toLowerCase().trim() == normalizedUnit,
     );
+
+    if (existingIndex != -1) {
+      if (quantity > 0) {
+        final existing = shoppingList[existingIndex];
+        shoppingList[existingIndex] = ShoppingItem(
+          id: existing.id,
+          name: existing.name,
+          quantity: existing.quantity + quantity,
+          unit: existing.unit,
+          purchased: existing.purchased,
+        );
+      }
+    } else {
+      shoppingList.add(
+        ShoppingItem(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          name: name.trim(),
+          quantity: quantity,
+          unit: unit.trim(),
+        ),
+      );
+    }
 
     saveData();
     notifyListeners();
@@ -224,17 +247,31 @@ class AppState extends ChangeNotifier {
       for (final ingredient in recipe.ingredients) {
         final ingredientName = ingredient.name.toLowerCase().trim();
 
-        final alreadyInPantry = pantryNames.contains(ingredientName);
+        if (pantryNames.contains(ingredientName)) continue;
 
-        final alreadyInShoppingList = shoppingList.any(
-          (item) => item.name.toLowerCase().trim() == ingredientName,
+        final ingredientUnit = ingredient.unit.toLowerCase().trim();
+        final existingIndex = shoppingList.indexWhere(
+          (item) =>
+              item.name.toLowerCase().trim() == ingredientName &&
+              item.unit.toLowerCase().trim() == ingredientUnit,
         );
 
-        if (!alreadyInPantry && !alreadyInShoppingList) {
+        if (existingIndex != -1) {
+          final existing = shoppingList[existingIndex];
+          shoppingList[existingIndex] = ShoppingItem(
+            id: existing.id,
+            name: existing.name,
+            quantity: existing.quantity + ingredient.quantity,
+            unit: existing.unit,
+            purchased: existing.purchased,
+          );
+        } else {
           shoppingList.add(
             ShoppingItem(
               id: DateTime.now().microsecondsSinceEpoch.toString(),
-              name: ingredient.displayText,
+              name: ingredient.name,
+              quantity: ingredient.quantity,
+              unit: ingredient.unit,
             ),
           );
         }

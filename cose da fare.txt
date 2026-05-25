@@ -1,11 +1,7 @@
 
 RICETTE
-( ) Controllo dei numeri nel form (ho messo che in "porzioni" puoi mettere solo un intero")
 ( ) Mostrare solo le ricette fattibili con gli ingredienti che abbiamo
-( ) Filtri in base a vari criteri
-
-  * Opzionale:
-    ( ) Mettere anche gli spuntini
+() possibilità di eliminare le  ricette
 
 
 LISTA SPESA
@@ -18,8 +14,7 @@ LISTA SPESA
     ( ) 2 tasti sotto a "Genera dal meal plan": tasti "seleziona tutti" e
         "elimina tutti"
 
-MEAL PLAN
-( ) Mettere ordinamento per giorno della settimana (ordine da lunedì a domenica)
+
 
 
 MEME
