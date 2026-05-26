@@ -1,5 +1,4 @@
-import 'ingredients.dart';
-import 'dart:convert';
+import 'recipe_ingredient.dart';
 
 class Recipe {
   int? id;
@@ -9,7 +8,7 @@ class Recipe {
   int preparationTime;
   String difficulty;
   int portions;
-  List<RecipeIngredient> ingredients;
+  List<RecipeIngredient> ingredients; 
   String notes;
   String? imagePath;
   bool isRecommended;
@@ -30,18 +29,17 @@ class Recipe {
     this.isFavorite = false,
   });
 
+
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'name': name,
       'description': description,
       'category': category,
       'preparationTime': preparationTime,
       'difficulty': difficulty,
       'portions': portions,
-      'ingredients': jsonEncode(
-        ingredients.map((e) => e.toJson()).toList(),
-      ),
+      // RIMOSSO IL CAMPO 'ingredients'
       'notes': notes,
       'imagePath': imagePath,
       'isRecommended': isRecommended ? 1 : 0,
@@ -58,9 +56,7 @@ class Recipe {
       preparationTime: map['preparationTime'],
       difficulty: map['difficulty'],
       portions: map['portions'],
-      ingredients: (jsonDecode(map['ingredients']) as List)
-        .map((e) => RecipeIngredient.fromJson(e))
-        .toList(),
+      ingredients: [], // Inizializzata vuota di default
       notes: map['notes'] ?? '',
       imagePath: map['imagePath'],
       isRecommended: map['isRecommended'] == 1,

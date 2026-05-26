@@ -2,18 +2,16 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/recipe.dart';
-import 'dart:convert';
+import '../models/recipe_ingredient.dart'; 
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
-
   static Database? _database;
 
   DatabaseHelper._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-
     _database = await _initDB('mealmate.db');
     return _database!;
   }
@@ -22,15 +20,23 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
+    
     return await openDatabase(
       path,
-      version: 6,
+      version: 7, 
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
+      onConfigure: _onConfigure, // Necessario per abilitare le Foreign Keys in SQLite
     );
   }
 
+  
+  Future _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
+
   Future<void> _createDB(Database db, int version) async {
+    // 1. Creazione Tabella Ricette 
     await db.execute('''
       CREATE TABLE recipes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +46,6 @@ class DatabaseHelper {
         preparationTime INTEGER NOT NULL,
         difficulty TEXT NOT NULL,
         portions INTEGER NOT NULL,
-        ingredients TEXT NOT NULL,
         notes TEXT,
         imagePath TEXT,
         isRecommended INTEGER NOT NULL DEFAULT 0,
@@ -48,164 +53,103 @@ class DatabaseHelper {
       )
     ''');
 
+    // 2. Creazione Tabella Ingredienti 
+    await db.execute('''
+      CREATE TABLE recipe_ingredients (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        recipeId INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        unit TEXT NOT NULL,
+        FOREIGN KEY (recipeId) REFERENCES recipes (id) ON DELETE CASCADE
+      )
+    ''');
+
     await _insertDefaultRecipes(db);
   }
 
-  Future<void> _upgradeDB(
-    Database db,
-    int oldVersion,
-    int newVersion,
-  ) async {
-      if (oldVersion < 6) {
-        await db.update(
-          'recipes',
-          {'imagePath': 'assets/images/carbonara.jpg'},
-          where: 'name = ?',
-          whereArgs: ['Spaghetti alla Carbonara'],
-        );
-
-        await db.update(
-          'recipes',
-          {'imagePath': 'assets/images/pancakes.jpg'},
-          where: 'name = ?',
-          whereArgs: ['Pancakes'],
-        );
-
-        await db.update(
-          'recipes',
-          {'imagePath': 'assets/images/insalata_pollo.jpg'},
-          where: 'name = ?',
-          whereArgs: ['Insalata di pollo'],
-        );
-
-        await db.update(
-          'recipes',
-          {'imagePath': 'assets/images/pasta_pesto.jpg'},
-          where: 'name = ?',
-          whereArgs: ['Pasta al pesto'],
-        );
-      }
-    }
-  
-
-  Future<void> _insertDefaultRecipes(Database db) async {
-    final defaultRecipes = [
-      {
-        'name': 'Spaghetti alla Carbonara',
-        'description': 'Cuoci la pasta. Prepara una crema con uova e pecorino. Rosola il guanciale e unisci tutto fuori dal fuoco.',
-        'category': 'Primo',
-        'preparationTime': 25,
-        'difficulty': 'Media',
-        'portions': 2,
-        'ingredients': jsonEncode([
-          {'name': 'spaghetti', 'quantity': 200, 'unit': 'g'},
-          {'name': 'uova', 'quantity': 2, 'unit': 'pz'},
-          {'name': 'pecorino', 'quantity': 50, 'unit': 'g'},
-          {'name': 'guanciale', 'quantity': 100, 'unit': 'g'},
-          {'name': 'pepe', 'quantity': 1, 'unit': 'q.b.'},
-        ]),
-        'notes': 'Mescolare lontano dal fuoco per evitare effetto frittata.',
-        'imagePath': 'assets/images/carbonara.jpg',
-        'isRecommended': 1,
-        'isFavorite': 1,
-      },
-      {
-        'name': 'Pancakes',
-        'description': 'Mescola farina, latte, uova e zucchero. Cuoci piccole porzioni di impasto in padella.',
-        'category': 'Colazione',
-        'preparationTime': 15,
-        'difficulty': 'Facile',
-        'portions': 4,
-        'ingredients': jsonEncode([
-          {'name': 'farina', 'quantity': 200, 'unit': 'g'},
-          {'name': 'latte', 'quantity': 250, 'unit': 'ml'},
-          {'name': 'uova', 'quantity': 2, 'unit': 'pz'},
-          {'name': 'zucchero', 'quantity': 30, 'unit': 'g'},
-          {'name': 'lievito', 'quantity': 1, 'unit': 'bustina'},
-        ]),
-        'notes': 'Servire con frutta o sciroppo.',
-        'imagePath': 'assets/images/pancakes.jpg',
-        'isRecommended': 1,
-        'isFavorite': 1,
-      },
-      {
-        'name': 'Insalata di pollo',
-        'description': 'Griglia il pollo, taglialo a strisce e uniscilo a insalata, pomodorini e mais.',
-        'category': 'Secondo',
-        'preparationTime': 20,
-        'difficulty': 'Facile',
-        'portions': 2,
-        'ingredients': jsonEncode([
-          {'name': 'pollo', 'quantity': 250, 'unit': 'g'},
-          {'name': 'insalata', 'quantity': 100, 'unit': 'g'},
-          {'name': 'pomodorini', 'quantity': 8, 'unit': 'pz'},
-          {'name': 'mais', 'quantity': 80, 'unit': 'g'},
-          {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
-        ]),
-        'notes': 'Ottima per un pranzo leggero.',
-        'imagePath': 'assets/images/insalata_pollo.jpg',
-        'isRecommended': 1,
-        'isFavorite': 0,
-      },
-      {
-        'name': 'Pasta al pesto',
-        'description': 'Cuoci la pasta e condiscila con pesto, parmigiano e un filo d’olio.',
-        'category': 'Primo',
-        'preparationTime': 15,
-        'difficulty': 'Facile',
-        'portions': 2,
-        'ingredients': jsonEncode([
-          {'name': 'pasta', 'quantity': 200, 'unit': 'g'},
-          {'name': 'pesto', 'quantity': 80, 'unit': 'g'},
-          {'name': 'parmigiano', 'quantity': 30, 'unit': 'g'},
-          {'name': 'olio', 'quantity': 1, 'unit': 'q.b.'},
-        ]),
-        'notes': 'Aggiungere patate o fagiolini per una versione più ricca.',
-        'imagePath': 'assets/images/pasta_pesto.jpg',
-        'isRecommended': 1,
-        'isFavorite': 0,
-      },
-    ];
-
-    for (final recipe in defaultRecipes) {
-      await db.insert('recipes', recipe);
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    // Gestione degli aggiornamenti
+    if (oldVersion < 6) {
+      
     }
   }
 
+  // INSERIMENTO
   Future<int> insertRecipe(Recipe recipe) async {
     final db = await instance.database;
-    return await db.insert('recipes', recipe.toMap());
+    
+    // Step 1: Salva la ricetta
+    final recipeId = await db.insert('recipes', recipe.toMap());
+    
+    // Step 2: Salva ogni ingrediente associandolo a quell'ID
+    for (final ingredient in recipe.ingredients) {
+      await db.insert('recipe_ingredients', ingredient.toMap(recipeId));
+    }
+    
+    return recipeId;
   }
 
+  // LETTURA: L'operazione di ricongiungimento
   Future<List<Recipe>> getRecipes() async {
     final db = await instance.database;
 
-    final result = await db.query(
-      'recipes',
-      orderBy: 'name ASC',
-    );
+    final recipeMaps = await db.query('recipes', orderBy: 'name ASC');
+    List<Recipe> recipes = [];
 
-    return result.map((map) => Recipe.fromMap(map)).toList();
+    for (final map in recipeMaps) {
+      
+      Recipe recipe = Recipe.fromMap(map);
+      
+      final ingredientMaps = await db.query(
+        'recipe_ingredients',
+        where: 'recipeId = ?',
+        whereArgs: [recipe.id],
+      );
+      
+      recipe.ingredients = ingredientMaps
+          .map((ingMap) => RecipeIngredient.fromMap(ingMap))
+          .toList();
+          
+      recipes.add(recipe);
+    }
+
+    return recipes;
   }
 
+  
   Future<int> updateRecipe(Recipe recipe) async {
     final db = await instance.database;
 
-    return await db.update(
+    final result = await db.update(
       'recipes',
       recipe.toMap(),
       where: 'id = ?',
       whereArgs: [recipe.id],
     );
+
+    await db.delete('recipe_ingredients', where: 'recipeId = ?', whereArgs: [recipe.id]);
+    
+    for (final ingredient in recipe.ingredients) {
+      await db.insert('recipe_ingredients', ingredient.toMap(recipe.id!));
+    }
+
+    return result;
   }
 
+  // ELIMINAZIONE
   Future<int> deleteRecipe(int id) async {
     final db = await instance.database;
-
+    
     return await db.delete(
       'recipes',
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+Future<void> _insertDefaultRecipes(Database db) async {
+    
+    
   }
 }
