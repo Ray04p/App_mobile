@@ -14,6 +14,11 @@ class AppState extends ChangeNotifier {
   List<MealPlanItem> mealPlan = [];
   List<ShoppingItem> shoppingList = [];
 
+  // --- 1. NUOVO STATO DEL FILTRO ---
+  bool _showOnlyAvailable = false;
+  bool get showOnlyAvailable => _showOnlyAvailable;
+  // ---------------------------------
+
   AppState() {
     loadData();
     loadRecipesFromDatabase();
@@ -70,6 +75,49 @@ class AppState extends ChangeNotifier {
       'shoppingList',
       jsonEncode(shoppingList.map((e) => e.toJson()).toList()),
     );
+  }
+
+  // -------------------------
+  // MOTORE DI FILTRAGGIO (NUOVO)
+  // -------------------------
+
+  void toggleAvailableFilter(bool value) {
+    _showOnlyAvailable = value;
+    notifyListeners();
+  }
+
+  List<Recipe> get filteredRecipes {
+    // Se l'interruttore è spento, mostriamo tutto
+    if (!_showOnlyAvailable) {
+      return recipes;
+    }
+
+    return recipes.where((recipe) {
+      // Se non ha ingredienti, la mostriamo a prescindere
+      if (recipe.ingredients.isEmpty) return true;
+
+      // Tutti gli ingredienti della ricetta devono superare il test matematico
+      return recipe.ingredients.every((recipeIng) {
+        
+        // 1. Troviamo gli elementi in dispensa col nome corrispondente
+        final matchingPantryItems = pantry.where((pantryItem) => 
+          pantryItem.name.toLowerCase().trim() == recipeIng.name.toLowerCase().trim()
+        );
+
+        // Se non ne abbiamo affatto, la ricetta fallisce immediatamente
+        if (matchingPantryItems.isEmpty) return false;
+
+        // 2. Sommiamo le quantità (castiamo a num.toDouble() per sicurezza
+        // nel caso il tuo PantryItem abbia quantity come int invece che double)
+        final totalAvailable = matchingPantryItems.fold<double>(
+          0.0, 
+          (sum, item) => sum + (item.quantity as num).toDouble()
+        );
+
+        // 3. Il verdetto: ne abbiamo a sufficienza?
+        return totalAvailable >= recipeIng.quantity;
+      });
+    }).toList();
   }
 
   // -------------------------
@@ -137,7 +185,7 @@ class AppState extends ChangeNotifier {
     final item = pantry.removeAt(oldIndex);
     pantry.insert(newIndex, item);
 
-    saveData(); // Fondamentale per salvare il nuovo ordine in SharedPreferences!
+    saveData(); 
     notifyListeners();
   }
 
@@ -234,7 +282,6 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void selectAllShoppingItems() {
     for (final item in shoppingList) {
       item.purchased = true;
@@ -250,7 +297,6 @@ class AppState extends ChangeNotifier {
     saveData();
     notifyListeners();
   }
-
 
   void generateShoppingListFromMealPlan() {
     final pantryNames = pantry
@@ -317,7 +363,6 @@ class AppState extends ChangeNotifier {
     }).toList();
   }
   
-
   List<PantryItem> expiringItems() {
     return pantry.where((item) => item.isExpiringSoon).toList();
   }

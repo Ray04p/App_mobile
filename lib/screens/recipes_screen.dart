@@ -27,8 +27,19 @@ class _RecipesScreenState extends State<RecipesScreen> {
         recipe.name.toLowerCase().contains(query) ||
         recipe.category.toLowerCase().contains(query);
 
-    final matchesCategory =
-        selectedCategory == 'Tutte' || recipe.category == selectedCategory;
+    final normalizedRecipeCategory = recipe.category.toLowerCase().trim();
+    final normalizedSelectedCategory = selectedCategory.toLowerCase().trim();
+    const standardCategories = ['primo', 'secondo', 'contorno', 'colazione', 'spuntino'];
+
+    bool matchesCategory;
+    
+    if (normalizedSelectedCategory == 'tutte') {
+      matchesCategory = true;
+    } else if (normalizedSelectedCategory == 'altro') {
+      matchesCategory = !standardCategories.contains(normalizedRecipeCategory);
+    } else {
+      matchesCategory = normalizedRecipeCategory == normalizedSelectedCategory;
+    }
 
     return matchesSearch && matchesCategory;
   }
@@ -71,13 +82,18 @@ class _RecipesScreenState extends State<RecipesScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
 
-    final suggested = app.suggestedRecipes().where(matchesFilters).toList()
+    final validRecipes = app.filteredRecipes;
+
+    final suggested = app.suggestedRecipes()
+      .where((recipe) => validRecipes.any((valid) => valid.id == recipe.id))
+      .where(matchesFilters).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
-    final allRecipes = app.recipes.where(matchesFilters).toList()
+    final allRecipes = validRecipes.where(matchesFilters).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     final showSuggestedSection = search.trim().isEmpty && suggested.isNotEmpty;
@@ -134,6 +150,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
               ),
             ),
             const SizedBox(height: 22),
+            
+            // BARRA DI RICERCA TESTUALE
             TextField(
               decoration: InputDecoration(
                 hintText: 'Cerca ricette o ingredienti...',
@@ -147,8 +165,32 @@ class _RecipesScreenState extends State<RecipesScreen> {
               ),
               onChanged: (value) => setState(() => search = value),
             ),
+            
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Icon(Icons.kitchen, size: 18, color: Colors.green[800]),
+                const SizedBox(width: 6),
+                const Text(
+                  'Solo con ingredienti in dispensa',
+                  style: TextStyle(
+                    fontSize: 15, 
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Switch(
+                  value: app.showOnlyAvailable,
+                  activeColor: Colors.green[800],
+                  onChanged: (bool value) {
+                    app.toggleAvailableFilter(value);
+                  },
+                ),
+              ],
+            ),
+
             if (showSuggestedSection) ...[
-              const SizedBox(height: 32),
+              const SizedBox(height: 18),
               sectionTitle('Consigliate da noi'),
               const SizedBox(height: 14),
               SizedBox(
@@ -264,7 +306,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
               const Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(
-                  child: Text('Nessuna ricetta trovata'),
+                  child: Text('Nessuna ricetta corrisponde ai criteri.'),
                 ),
               )
             else

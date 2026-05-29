@@ -41,6 +41,45 @@ class RecipeDetailScreen extends StatelessWidget {
     return Image.file(file, fit: BoxFit.cover);
   }
 
+  // --- LA LOGICA DI ELIMINAZIONE INCAPSULATA ---
+  void _confirmDelete(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Elimina Ricetta'),
+          content: const Text(
+            'Sei sicuro di voler eliminare questa ricetta? L\'azione cancellerà anche gli ingredienti associati in modo irreversibile.',
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(), // Chiude solo il popup
+              child: const Text('Annulla', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () async {
+                Navigator.of(ctx).pop(); // 1. Chiudi il popup
+                
+                // 2. Chiedi al Provider di distruggere i dati dal DB Relazionale
+                final app = Provider.of<AppState>(context, listen: false);
+                await app.deleteRecipe(id);
+                
+                // 3. Torna alla schermata principale se l'app è ancora in esecuzione
+                if (context.mounted) {
+                  Navigator.of(context).pop(); 
+                }
+              },
+              child: const Text('Elimina', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  // ----------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
@@ -70,6 +109,7 @@ class RecipeDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 10),
                 child: Row(
                   children: [
+                    // PULSANTE 1: CUORE (Preferiti)
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -98,6 +138,7 @@ class RecipeDetailScreen extends StatelessWidget {
 
                     const SizedBox(width: 10),
 
+                    // PULSANTE 2: MODIFICA
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -123,6 +164,31 @@ class RecipeDetailScreen extends StatelessWidget {
                               ),
                             ),
                           );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    // PULSANTE 3: ELIMINA (Nuovo Inserimento)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.redAccent,
+                        ),
+                        onPressed: () {
+                          _confirmDelete(context, recipe.id!);
                         },
                       ),
                     ),
@@ -182,9 +248,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       recipe.category,
                       style: TextStyle(
@@ -193,9 +257,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     const SizedBox(height: 22),
-
                     Text(
                       recipe.description,
                       style: const TextStyle(
@@ -203,9 +265,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         height: 1.45,
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -226,13 +286,9 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 32),
-
                     sectionTitle('Ingredienti'),
-
                     const SizedBox(height: 12),
-
                     ...recipe.ingredients.map(
                       (ingredient) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -258,13 +314,9 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
                     sectionTitle('Preparazione'),
-
                     const SizedBox(height: 12),
-
                     Text(
                       recipe.description,
                       style: const TextStyle(
@@ -272,7 +324,6 @@ class RecipeDetailScreen extends StatelessWidget {
                         height: 1.5,
                       ),
                     ),
-
                     if (recipe.notes.isNotEmpty) ...[
                       const SizedBox(height: 28),
                       sectionTitle('Note'),
