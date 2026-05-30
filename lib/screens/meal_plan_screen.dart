@@ -151,6 +151,76 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     _doAddMeal(app);
   }
 
+
+  void editMeal(AppState app, MealPlanItem item) {
+    String tempDay = item.day;
+    String tempMeal = item.mealType;
+    String? tempRecipeId = item.recipeId;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Modifica pasto'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: tempDay,
+              decoration: const InputDecoration(labelText: 'Giorno'),
+              items: days
+                  .map((day) => DropdownMenuItem(value: day, child: Text(day)))
+                  .toList(),
+              onChanged: (value) => tempDay = value!,
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: tempMeal,
+              decoration: const InputDecoration(labelText: 'Pasto'),
+              items: meals
+                  .map((meal) => DropdownMenuItem(value: meal, child: Text(meal)))
+                  .toList(),
+              onChanged: (value) => tempMeal = value!,
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: tempRecipeId,
+              decoration: const InputDecoration(labelText: 'Ricetta'),
+              items: app.recipes
+                  .map((r) => DropdownMenuItem(
+                        value: r.id.toString(),
+                        child: Text(r.name),
+                      ))
+                  .toList(),
+              onChanged: (value) => tempRecipeId = value,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Annulla'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (tempRecipeId == null) return;
+
+              app.updateMealPlanItem(
+                MealPlanItem(
+                  id: item.id,
+                  weekStart: item.weekStart,
+                  day: tempDay,
+                  mealType: tempMeal,
+                  recipeId: tempRecipeId!,
+                ),
+              );
+
+              Navigator.pop(ctx);
+            },
+            child: const Text('Salva'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
@@ -322,9 +392,18 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
                                     child: Icon(Icons.restaurant, color: Colors.green[900]),
                                   ),
                                   title: Text(recipe?.name ?? 'Ricetta eliminata', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () => app.deleteMealPlanItem(item.id),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () => editMeal(app, item),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () => app.deleteMealPlanItem(item.id),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );

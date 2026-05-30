@@ -77,7 +77,7 @@ class AppState extends ChangeNotifier {
   }
 
   // -------------------------
-  // MOTORE DI FILTRAGGIO (NUOVO)
+  // FILTRAGGIO
   // -------------------------
 
   void toggleAvailableFilter(bool value) {
@@ -198,6 +198,16 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateMealPlanItem(MealPlanItem updatedItem) {
+    final index = mealPlan.indexWhere((item) => item.id == updatedItem.id);
+
+    if (index != -1) {
+      mealPlan[index] = updatedItem;
+      saveData();
+      notifyListeners();
+    }
+  }
+
   void deleteMealPlanItem(String id) {
     mealPlan.removeWhere((item) => item.id == id);
     saveData();
@@ -298,10 +308,6 @@ class AppState extends ChangeNotifier {
   }
 
   void generateShoppingListFromMealPlan() {
-    final pantryNames = pantry
-        .map((item) => item.name.toLowerCase().trim())
-        .toList();
-
     for (final planItem in mealPlan) {
       final recipe = recipeById(planItem.recipeId);
 
@@ -309,10 +315,27 @@ class AppState extends ChangeNotifier {
 
       for (final ingredient in recipe.ingredients) {
         final ingredientName = ingredient.name.toLowerCase().trim();
-
-        if (pantryNames.contains(ingredientName)) continue;
-
         final ingredientUnit = ingredient.unit.toLowerCase().trim();
+
+        // Cerca in dispensa lo stesso ingrediente con la stessa unità
+        final matchingPantryItems = pantry.where(
+          (item) =>
+              item.name.toLowerCase().trim() == ingredientName &&
+              item.unit.toLowerCase().trim() == ingredientUnit,
+        );
+
+        // Somma la quantità disponibile in dispensa
+        final availableQuantity = matchingPantryItems.fold<double>(
+          0.0,
+          (sum, item) => sum + item.quantity,
+        );
+
+        // Calcola solo la quantità mancante
+        final missingQuantity = ingredient.quantity - availableQuantity;
+
+        // Se ne abbiamo abbastanza, non lo aggiungiamo alla lista spesa
+        if (missingQuantity <= 0) continue;
+
         final existingIndex = shoppingList.indexWhere(
           (item) =>
               item.name.toLowerCase().trim() == ingredientName &&
@@ -321,10 +344,11 @@ class AppState extends ChangeNotifier {
 
         if (existingIndex != -1) {
           final existing = shoppingList[existingIndex];
+
           shoppingList[existingIndex] = ShoppingItem(
             id: existing.id,
             name: existing.name,
-            quantity: existing.quantity + ingredient.quantity,
+            quantity: existing.quantity + missingQuantity,
             unit: existing.unit,
             purchased: existing.purchased,
           );
@@ -333,7 +357,7 @@ class AppState extends ChangeNotifier {
             ShoppingItem(
               id: DateTime.now().microsecondsSinceEpoch.toString(),
               name: ingredient.name,
-              quantity: ingredient.quantity,
+              quantity: missingQuantity,
               unit: ingredient.unit,
             ),
           );
