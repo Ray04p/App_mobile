@@ -225,22 +225,18 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   Future<void> showAddToPantryDialog(
     BuildContext context,
     AppState app,
-    dynamic item, 
+    dynamic item, // ShoppingItem
   ) async {
     final categoryController = TextEditingController();
     final notesController = TextEditingController();
 
-    // Lasciamo che l'utente confermi/modifichi la quantità
     final dialogQuantityController = TextEditingController(
       text: item.quantity > 0 ? item.quantity.toString() : '1'
     );
     
-    // Protezione: se l'unità è "sporca" o non esiste, usiamo "pz" di default
     String dialogSelectedUnit = allowedUnits.contains(item.unit) ? item.unit : 'pz';
 
-    DateTime expiryDate = DateTime.now().add(
-      const Duration(days: 7),
-    );
+    DateTime? expiryDate; 
 
     await showDialog(
       context: context,
@@ -259,7 +255,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                     ),
                     const SizedBox(height: 18),
                     
-                    // RIGA DI CONFERMA NEL POPUP
                     Row(
                       children: [
                         Expanded(
@@ -321,17 +316,29 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
+                    
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Data di scadenza'),
-                      subtitle: Text('${expiryDate.day}/${expiryDate.month}/${expiryDate.year}'),
-                      trailing: const Icon(Icons.calendar_month),
+                      subtitle: Text(
+                        expiryDate != null 
+                            ? '${expiryDate!.day}/${expiryDate!.month}/${expiryDate!.year}'
+                            : 'Nessuna scadenza impostata',
+                        style: TextStyle(
+                          color: expiryDate != null ? Colors.black87 : Colors.grey[600],
+                          fontWeight: expiryDate != null ? FontWeight.normal : FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.calendar_month, 
+                        color: expiryDate != null ? Theme.of(context).colorScheme.primary : Colors.grey
+                      ),
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2100),
-                          initialDate: expiryDate,
+                          initialDate: expiryDate ?? DateTime.now(),
                         );
 
                         if (picked != null) {
@@ -367,7 +374,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                             : categoryController.text.trim(),
                         quantity: finalQuantity, 
                         unit: dialogSelectedUnit, 
-                        expiryDate: expiryDate,
+                        expiryDate: expiryDate, 
                         notes: notesController.text.trim(),
                       ),
                     );
