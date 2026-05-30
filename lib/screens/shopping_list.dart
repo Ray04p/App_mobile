@@ -311,8 +311,8 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         category: categoryController.text.trim().isEmpty
                             ? 'Altro'
                             : categoryController.text.trim(),
-                        quantity: 1,
-                        unit: 'pz',
+                        quantity: item.quantity > 0 ? item.quantity : 1,  //fallback 1
+                        unit: item.unit.isNotEmpty ? item.unit : 'pz',    //fallback pz
                         expiryDate: expiryDate,
                         notes: notesController.text.trim(),
                       ),

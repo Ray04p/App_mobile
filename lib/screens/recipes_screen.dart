@@ -288,8 +288,16 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                         ? Colors.red
                                         : Colors.black87,
                                   ),
-                                  onPressed: () {
-                                    app.toggleFavoriteRecipe(recipe);
+                                 onPressed: () async {
+                                    try {
+                                      await app.toggleFavoriteRecipe(recipe);
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Errore nel salvataggio dei preferiti')),
+                                        );
+                                      }
+                                    }
                                   },
                                 ),
                               ),
@@ -399,8 +407,16 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                 : Icons.favorite_border,
                             color: recipe.isFavorite ? Colors.red : null,
                           ),
-                          onPressed: () {
-                            app.toggleFavoriteRecipe(recipe);
+                          onPressed: () async {
+                            try {
+                              await app.toggleFavoriteRecipe(recipe);
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Errore nel salvataggio dei preferiti')),
+                                );
+                              }
+                            }
                           },
                         ),
                       ],

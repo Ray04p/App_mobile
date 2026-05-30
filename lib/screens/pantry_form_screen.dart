@@ -50,7 +50,13 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
 
     name = TextEditingController(text: item?.name ?? '');
     category = TextEditingController(text: item?.category ?? '');
-    quantity = TextEditingController(text: item?.quantity.toString() ?? '');
+    quantity = TextEditingController(
+      text: item == null
+          ? ''
+          : (item.quantity.truncateToDouble() == item.quantity
+              ? item.quantity.toInt().toString()
+              : item.quantity.toString()),
+    );
     unit = TextEditingController(text: item?.unit ?? '');
     if (item != null && units.contains(item.unit)) {
       selectedUnit = item.unit;

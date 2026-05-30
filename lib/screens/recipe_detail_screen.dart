@@ -137,8 +137,16 @@ class RecipeDetailScreen extends StatelessWidget {
                               ? Colors.red
                               : Colors.black87,
                         ),
-                        onPressed: () {
-                          app.toggleFavoriteRecipe(recipe);
+                        onPressed: () async {
+                          try {
+                            await app.toggleFavoriteRecipe(recipe);
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Errore nel salvataggio dei preferiti')),
+                              );
+                            }
+                          }
                         },
                       ),
                     ),
@@ -177,7 +185,7 @@ class RecipeDetailScreen extends StatelessWidget {
 
                     const SizedBox(width: 10),
 
-                    // PULSANTE 3: ELIMINA (Nuovo Inserimento)
+                    // PULSANTE 3: ELIMINA
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -262,14 +270,6 @@ class RecipeDetailScreen extends StatelessWidget {
                         fontSize: 18,
                         color: Colors.green[700],
                         fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Text(
-                      recipe.description,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        height: 1.45,
                       ),
                     ),
                     const SizedBox(height: 28),

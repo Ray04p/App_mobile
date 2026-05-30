@@ -17,7 +17,6 @@ class PantryItem {
     this.notes = '',
   });
 
-  bool get isLowStock => quantity <= 1;
 
   bool get isExpiringSoon {
     if (expiryDate == null) return false;

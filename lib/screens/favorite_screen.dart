@@ -302,8 +302,16 @@ class _FavoriteRecipesScreenState extends State<FavoriteRecipesScreen> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.favorite, color: Colors.red),
-                    onPressed: () {
-                      app.toggleFavoriteRecipe(recipe);
+                   onPressed: () async {
+                      try {
+                        await app.toggleFavoriteRecipe(recipe);
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Errore nel salvataggio dei preferiti')),
+                          );
+                        }
+                      }
                     },
                   ),
                   onTap: () {
