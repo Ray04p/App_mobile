@@ -14,7 +14,15 @@ class ShoppingListScreen extends StatefulWidget {
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
   final nameController = TextEditingController();
   final quantityController = TextEditingController();
-  final unitController = TextEditingController();
+  
+  // 1. LA VARIABILE DI STATO PER LA TENDINA
+  String selectedUnit = 'pz';
+
+  // 2. LE UNITÀ CONSENTITE
+  static const allowedUnits = [
+    'g', 'kg', 'ml', 'L', 'pz', 'oz', 'lb', 
+    'cucchiaio', 'tazza', 'bustina', 'a piacere', 'Altro'
+  ];
 
   void addItem(AppState app) {
     final name = nameController.text.trim();
@@ -24,20 +32,21 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           quantityController.text.trim().replaceAll(',', '.'),
         ) ??
         0;
-    final unit = unitController.text.trim();
 
-    app.addShoppingItem(name, quantity: quantity, unit: unit);
+    // 3. SALVATAGGIO USANDO IL VALORE DELLA TENDINA
+    app.addShoppingItem(name, quantity: quantity, unit: selectedUnit);
 
     nameController.clear();
     quantityController.clear();
-    unitController.clear();
+    setState(() {
+      selectedUnit = 'pz'; // Reset della tendina dopo l'invio
+    });
   }
 
   @override
   void dispose() {
     nameController.dispose();
     quantityController.dispose();
-    unitController.dispose();
     super.dispose();
   }
 
@@ -64,6 +73,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start, // Allineamento per il dropdown
               children: [
                 SizedBox(
                   width: 64,
@@ -82,19 +92,34 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                   ),
                 ),
                 const SizedBox(width: 6),
+                
+                // 4. IL MENU A TENDINA (Sostituisce il TextField)
                 SizedBox(
-                  width: 72,
-                  child: TextField(
-                    controller: unitController,
-                    textAlign: TextAlign.center,
+                  width: 90,
+                  child: DropdownButtonFormField<String>(
+                    value: selectedUnit,
                     decoration: const InputDecoration(
                       labelText: 'Unità',
-                      hintText: 'g, ml…',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                     ),
+                    isExpanded: true,
+                    items: allowedUnits.map((String u) {
+                      return DropdownMenuItem<String>(
+                        value: u,
+                        child: Text(u, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedUnit = newValue;
+                        });
+                      }
+                    },
                   ),
                 ),
+                
                 const SizedBox(width: 6),
                 Expanded(
                   child: TextField(
@@ -132,9 +157,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               label: const Text('Genera dal meal plan'),
             ),
           ),
-
-
-          //"SELEZIONA/ELIMINA"
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -162,9 +184,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               ],
             ),
           ),
-
-
-          //LISTA
           Expanded(
             child: sortedList.isEmpty
                 ? const Center(child: Text('Lista vuota'))
@@ -203,20 +222,21 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
     );
   }
 
-
-
-
-
-
-
-
   Future<void> showAddToPantryDialog(
     BuildContext context,
     AppState app,
-    dynamic item,
+    dynamic item, 
   ) async {
     final categoryController = TextEditingController();
     final notesController = TextEditingController();
+
+    // Lasciamo che l'utente confermi/modifichi la quantità
+    final dialogQuantityController = TextEditingController(
+      text: item.quantity > 0 ? item.quantity.toString() : '1'
+    );
+    
+    // Protezione: se l'unità è "sporca" o non esiste, usiamo "pz" di default
+    String dialogSelectedUnit = allowedUnits.contains(item.unit) ? item.unit : 'pz';
 
     DateTime expiryDate = DateTime.now().add(
       const Duration(days: 7),
@@ -228,22 +248,62 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text(
-                'Aggiungere in dispensa?',
-              ),
-
+              title: const Text('Aggiungere in dispensa?'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       item.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
-
                     const SizedBox(height: 18),
+                    
+                    // RIGA DI CONFERMA NEL POPUP
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TextField(
+                            controller: dialogQuantityController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+                            decoration: const InputDecoration(
+                              labelText: 'Qtà',
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField<String>(
+                            value: dialogSelectedUnit,
+                            decoration: const InputDecoration(
+                              labelText: 'Unità',
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                            ),
+                            isExpanded: true,
+                            items: allowedUnits.map((String u) {
+                              return DropdownMenuItem<String>(
+                                value: u,
+                                child: Text(u, overflow: TextOverflow.ellipsis),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setDialogState(() {
+                                  dialogSelectedUnit = newValue;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
 
                     TextField(
                       controller: categoryController,
@@ -252,9 +312,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-
                     const SizedBox(height: 14),
-
                     TextField(
                       controller: notesController,
                       decoration: const InputDecoration(
@@ -262,17 +320,11 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-
                     const SizedBox(height: 14),
-
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text(
-                        'Data di scadenza',
-                      ),
-                      subtitle: Text(
-                        '${expiryDate.day}/${expiryDate.month}/${expiryDate.year}',
-                      ),
+                      title: const Text('Data di scadenza'),
+                      subtitle: Text('${expiryDate.day}/${expiryDate.month}/${expiryDate.year}'),
                       trailing: const Icon(Icons.calendar_month),
                       onTap: () async {
                         final picked = await showDatePicker(
@@ -292,7 +344,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                   ],
                 ),
               ),
-
               actions: [
                 TextButton(
                   onPressed: () {
@@ -301,9 +352,12 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                   },
                   child: const Text('Solo elimina'),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
+                    final finalQuantity = double.tryParse(
+                      dialogQuantityController.text.trim().replaceAll(',', '.')
+                    ) ?? 1.0;
+
                     app.addPantryItem(
                       PantryItem(
                         id: DateTime.now().microsecondsSinceEpoch.toString(),
@@ -311,20 +365,17 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         category: categoryController.text.trim().isEmpty
                             ? 'Altro'
                             : categoryController.text.trim(),
-                        quantity: item.quantity > 0 ? item.quantity : 1,  //fallback 1
-                        unit: item.unit.isNotEmpty ? item.unit : 'pz',    //fallback pz
+                        quantity: finalQuantity, 
+                        unit: dialogSelectedUnit, 
                         expiryDate: expiryDate,
                         notes: notesController.text.trim(),
                       ),
                     );
 
                     app.deleteShoppingItem(item.id);
-
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Aggiungi',
-                  ),
+                  child: const Text('Aggiungi'),
                 ),
               ],
             );
@@ -334,4 +385,3 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
     );
   }
 }
-

@@ -10,17 +10,27 @@ import '../providers/app_state.dart';
 class IngredientRow {
   final TextEditingController nameController;
   final TextEditingController quantityController;
-  final TextEditingController unitController;
+  String selectedUnit; // Non è più un controller, ma una stringa fissa
+
+  // La lista delle unità consentite come costante statica
+  static const allowedUnits = [
+    'g', 'kg', 'ml', 'L', 'pz', 'oz', 'lb', 
+    'cucchiaio', 'tazza', 'bustina', 'a piacere', 'Altro'
+  ];
 
   IngredientRow({String name = '', String quantity = '', String unit = ''})
       : nameController = TextEditingController(text: name),
         quantityController = TextEditingController(text: quantity),
-        unitController = TextEditingController(text: unit);
+        // Programmazione difensiva: se modifichiamo una vecchia ricetta con
+        // un'unità non valida (es. "grammi"), impostiamo di default "Altro" o "g"
+        // per evitare il crash del Dropdown.
+        selectedUnit = allowedUnits.contains(unit) 
+            ? unit 
+            : (unit.isEmpty ? 'g' : 'Altro');
 
   void dispose() {
     nameController.dispose();
     quantityController.dispose();
-    unitController.dispose();
   }
 }
 
@@ -128,7 +138,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
         parsedIngredients.add(RecipeIngredient(
           name: ingName,
           quantity: double.tryParse(row.quantityController.text.trim()) ?? 0.0,
-          unit: row.unitController.text.trim().isEmpty ? 'pz' : row.unitController.text.trim(),
+          unit: row.selectedUnit,
         ));
       }
     }
@@ -295,7 +305,40 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     flex: 2,
-                    child: field('Unità', row.unitController, validator: (v) => null), // Es: g, ml, pz
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: DropdownButtonFormField<String>(
+                        value: row.selectedUnit,
+                        decoration: InputDecoration(
+                          labelText: 'Unità',
+                          labelStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 18,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        isExpanded: true, // Evita errori di rendering se il testo è lungo
+                        items: IngredientRow.allowedUnits.map((String u) {
+                          return DropdownMenuItem<String>(
+                            value: u,
+                            child: Text(u, overflow: TextOverflow.ellipsis),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              row.selectedUnit = newValue;
+                            });
+                          }
+                        },
+                      ),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.remove_circle, color: Colors.red),
