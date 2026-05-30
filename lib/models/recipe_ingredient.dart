@@ -15,9 +15,7 @@ class RecipeIngredient {
 
   String get displayText {
 
-    String formattedQuantity = quantity == quantity.truncateToDouble()
-        ? quantity.toInt().toString()
-        : quantity.toString();
+    String formattedQuantity = quantity == quantity.truncateToDouble() ? quantity.toInt().toString() : quantity.toString();
 
     if (quantity <= 0) {
       return '$name $unit'.trim();

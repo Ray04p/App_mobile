@@ -17,6 +17,7 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return Scaffold(
+      //TITOLO E SLOGAN
       appBar: AppBar(
         toolbarHeight: 110,
         centerTitle: true,
@@ -49,6 +50,9 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+
+
+      //GRIGLIA
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.builder(
@@ -58,6 +62,8 @@ class HomeScreen extends StatelessWidget {
             mainAxisSpacing: 14,
             crossAxisSpacing: 14,
           ),
+
+          //SINGOLA CARD
           itemBuilder: (context, index) {
             return Card(
               child: InkWell(
@@ -84,6 +90,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 },
+                //stile della card
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -15,9 +15,7 @@ class ShoppingItem {
 
   String get displayText {
     if (quantity <= 0 && unit.isEmpty) return name;
-    final qText = quantity % 1 == 0
-        ? quantity.toInt().toString()
-        : quantity.toString();
+    final qText = quantity % 1 == 0 ? quantity.toInt().toString() : quantity.toString();
     if (unit.isEmpty) return '$qText $name';
     return '$qText $unit $name';
   }

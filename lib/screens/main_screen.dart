@@ -5,7 +5,6 @@ import 'meal_plan_screen.dart';
 import 'shopping_list.dart';
 import 'stats.dart';
 
-// Sostituisci HomeScreen con questo:
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
@@ -34,7 +33,6 @@ class _MainScreenState extends State<MainScreen> {
 
   // Le schermate — stesso ordine della barra in basso
   final List<Widget> _screens = const [
-  //  HomeScreen(),
     RecipesScreen(),
     PantryScreen(),
     MealPlanScreen(),
@@ -44,7 +42,6 @@ class _MainScreenState extends State<MainScreen> {
 
   // Voci della barra in basso
   final List<BottomNavigationBarItem> _navItems = const [
-   // BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
     BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: 'Ricette'),
     BottomNavigationBarItem(icon: Icon(Icons.kitchen), label: 'Dispensa'),
     BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Meal Plan'),

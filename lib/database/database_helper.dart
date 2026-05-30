@@ -1,6 +1,5 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
 import '../models/recipe.dart';
 import '../models/recipe_ingredient.dart'; 
 
@@ -23,7 +22,7 @@ class DatabaseHelper {
     
     return await openDatabase(
       path,
-      version: 7, 
+      version: 10, 
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onConfigure: _onConfigure, // Necessario per abilitare le Foreign Keys in SQLite
@@ -70,9 +69,10 @@ class DatabaseHelper {
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     // Gestione degli aggiornamenti
-    if (oldVersion < 6) {
-      
-    }
+    // Ricrea tutto da zero eliminando le tabelle vecchie
+    //await db.execute('DROP TABLE IF EXISTS recipe_ingredients');
+    //await db.execute('DROP TABLE IF EXISTS recipes');
+    //await _createDB(db, newVersion);
   }
 
   // INSERIMENTO
@@ -148,8 +148,81 @@ class DatabaseHelper {
     );
   }
 
-Future<void> _insertDefaultRecipes(Database db) async {
-    
-    
+
+  Future<void> _insertDefaultRecipes(Database db) async {
+    // Lista delle ricette hardcoded
+    final defaultRecipes = [
+      {
+        'name': 'Pasta al pomodoro',
+        'description': 'Cuocere la pasta in abbondante acqua salata. In parallelo soffriggere aglio in olio, aggiungere la passata di pomodoro e cuocere 10 minuti. Scolare la pasta e mantecare con il sugo.',
+        'category': 'Primo',
+        'preparationTime': 20,
+        'difficulty': 'Facile',
+        'portions': 2,
+        'notes': 'Aggiungere basilico fresco a fine cottura.',
+        'imagePath': null,
+        'isRecommended': 1,
+        'isFavorite': 0,
+      },
+      {
+        'name': 'Insalata mista',
+        'description': 'Lavare e tagliare le verdure. Condire con olio, sale e aceto.',
+        'category': 'Contorno',
+        'preparationTime': 10,
+        'difficulty': 'Facile',
+        'portions': 2,
+        'notes': '',
+        'imagePath': null,
+        'isRecommended': 1,
+        'isFavorite': 0,
+      },
+      {
+        'name': 'Pollo alla griglia',
+        'description': 'Marinare il petto di pollo con olio, limone, sale e pepe per 30 minuti. Cuocere sulla piastra calda 6-7 minuti per lato.',
+        'category': 'Secondo',
+        'preparationTime': 45,
+        'difficulty': 'Facile',
+        'portions': 2,
+        'notes': 'Servire con spicchi di limone.',
+        'imagePath': null,
+        'isRecommended': 1,
+        'isFavorite': 0,
+      },
+    ];
+
+    final defaultIngredients = {
+      'Pasta al pomodoro': [
+        {'name': 'Pasta', 'quantity': 320.0, 'unit': 'g'},
+        {'name': 'Passata di pomodoro', 'quantity': 400.0, 'unit': 'g'},
+        {'name': 'Aglio', 'quantity': 2.0, 'unit': 'pz'},
+        {'name': 'Olio', 'quantity': 3.0, 'unit': 'cucchiaio'},
+      ],
+      'Insalata mista': [
+        {'name': 'Lattuga', 'quantity': 1.0, 'unit': 'pz'},
+        {'name': 'Pomodori', 'quantity': 2.0, 'unit': 'pz'},
+        {'name': 'Olio', 'quantity': 2.0, 'unit': 'cucchiaio'},
+      ],
+      'Pollo alla griglia': [
+        {'name': 'Petto di pollo', 'quantity': 400.0, 'unit': 'g'},
+        {'name': 'Limone', 'quantity': 1.0, 'unit': 'pz'},
+        {'name': 'Olio', 'quantity': 2.0, 'unit': 'cucchiaio'},
+      ],
+    };
+
+    for (final recipe in defaultRecipes) {
+      // Inserisce la ricetta e ottiene l'id generato
+      final recipeId = await db.insert('recipes', recipe);
+
+      // Inserisce gli ingredienti associati
+      final ingredients = defaultIngredients[recipe['name']] ?? [];
+      for (final ingredient in ingredients) {
+        await db.insert('recipe_ingredients', {
+          'recipeId': recipeId,
+          'name': ingredient['name'],
+          'quantity': ingredient['quantity'],
+          'unit': ingredient['unit'],
+        });
+      }
+    }
   }
 }

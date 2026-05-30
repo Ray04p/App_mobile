@@ -24,16 +24,22 @@ class StatsScreen extends StatelessWidget {
           ),
         ),
       ),
+
+
+      //ELENCO STATISTICHE
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           statCard('Ricette salvate', app.recipes.length.toString()),
+          statCard('Tempo medio di preparazione delle ricette', '${app.averagePreparationTime} min'),
           statCard('Prodotti in dispensa', app.pantry.length.toString()),
           statCard('Pasti pianificati', app.mealPlan.length.toString()),
           statCard('Elementi lista spesa', app.shoppingList.length.toString()),
           statCard('Prodotti vicini alla scadenza', expiring.length.toString()),
           statCard('Prodotti scaduti', expired.length.toString()),
+          
 
+          //PRODOTTI IN SCADENZA
           const SizedBox(height: 30),
           const Text(
             'Prodotti in scadenza',
@@ -47,7 +53,7 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
 
-
+          //PRODOTTI SCADUTI
           const SizedBox(height: 16),
           const Text(
             'Prodotti scaduti',
@@ -62,6 +68,7 @@ class StatsScreen extends StatelessWidget {
           ),
 
 
+          //BOX PREFERITE
           const SizedBox(height: 16),
           Card(
             color: Colors.red.shade50,
@@ -88,6 +95,7 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  //È un metodo privato della classe che genera una card con titolo a sinistra e valore numerico grande a destra. Viene chiamato 7 volte in ListViewcon dati diversi.
   Widget statCard(String title, String value) {
     return Card(
       child: ListTile(

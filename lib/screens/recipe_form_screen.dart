@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
-
 import '../models/recipe.dart';
-import '../models/recipe_ingredient.dart'; // IMPORT AGGIORNATO AL NUOVO MODELLO
+import '../models/recipe_ingredient.dart';
 import '../providers/app_state.dart';
 
 // Classe di supporto per gestire i controller di ogni singola riga
@@ -48,8 +47,9 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
   int selectedHours = 0;
   int selectedMinutes = 0;
 
-  // LA NUOVA LISTA DINAMICA
   final List<IngredientRow> _ingredientRows = [];
+
+
 
   @override
   void initState() {
@@ -237,7 +237,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<int>(
-                    value: selectedHours,
+                    initialValue: selectedHours,
                     decoration: const InputDecoration(labelText: 'Ore', border: OutlineInputBorder()),
                     items: List.generate(13, (index) => DropdownMenuItem(value: index, child: Text('$index h'))),
                     onChanged: (value) => setState(() => selectedHours = value ?? 0),
@@ -246,7 +246,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<int>(
-                    value: selectedMinutes,
+                    initialValue: selectedMinutes,
                     decoration: const InputDecoration(labelText: 'Minuti', border: OutlineInputBorder()),
                     items: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
                         .map((m) => DropdownMenuItem(value: m, child: Text('$m min')))
@@ -273,7 +273,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
 
             field('Porzioni', portions, type: TextInputType.number),
 
-            // IL NUOVO BLOCCO INGREDIENTI DINAMICO
+            
             const Text("Ingredienti", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             ..._ingredientRows.asMap().entries.map((entry) {

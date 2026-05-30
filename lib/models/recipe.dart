@@ -39,7 +39,6 @@ class Recipe {
       'preparationTime': preparationTime,
       'difficulty': difficulty,
       'portions': portions,
-      // RIMOSSO IL CAMPO 'ingredients'
       'notes': notes,
       'imagePath': imagePath,
       'isRecommended': isRecommended ? 1 : 0,
@@ -57,10 +56,10 @@ class Recipe {
       difficulty: map['difficulty'],
       portions: map['portions'],
       ingredients: [], // Inizializzata vuota di default
-      notes: map['notes'] ?? '',
+      notes: map['notes'] ?? '',  //Se json['notes'] esiste e non è null, usa quel valore, altrimenti stringa vuota ''
       imagePath: map['imagePath'],
-      isRecommended: map['isRecommended'] == 1,
-      isFavorite: map['isFavorite'] == 1,
+      isRecommended: map['isRecommended'] == 1, //cast da int a bool
+      isFavorite: map['isFavorite'] == 1,   //cast da int a bool
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../models/recipe.dart';
 import '../providers/app_state.dart';
 import 'recipe_form_screen.dart';
@@ -15,9 +13,11 @@ class RecipeDetailScreen extends StatelessWidget {
     required this.recipeId,
   });
 
+  //È un metodo privato della classe che gestisce l'immagine della ricetta e restituisce un widget
   Widget recipeImage(Recipe recipe) {
     final path = recipe.imagePath;
 
+    //se l'immagine non esiste
     if (path == null || path.isEmpty) {
       return Container(
         color: Colors.grey.shade200,
@@ -25,12 +25,15 @@ class RecipeDetailScreen extends StatelessWidget {
       );
     }
 
+    //Se il path inizia con assets/ significa che l'immagine è inclusa nel pacchetto dell'app - tipicamente usato per ricette di default o di esempio inserite dal team.
+    //Si carica con Image.asset che legge dal bundle dell'app, non dal filesystem del dispositivo.
     if (path.startsWith('assets/')) {
       return Image.asset(path, fit: BoxFit.cover);
     }
 
     final file = File(path);
 
+    //Se il path punta a un file locale ma il file non esiste più — ad esempio perché l'utente ha cancellato la foto dalla galleria o ha cambiato dispositivo
     if (!file.existsSync()) {
       return Container(
         color: Colors.grey.shade200,
@@ -38,8 +41,11 @@ class RecipeDetailScreen extends StatelessWidget {
       );
     }
 
+    //il file esiste sul dispositivo dell'utente
     return Image.file(file, fit: BoxFit.cover);
   }
+
+
 
   // --- LA LOGICA DI ELIMINAZIONE INCAPSULATA ---
   void _confirmDelete(BuildContext context, int id) {
@@ -78,7 +84,8 @@ class RecipeDetailScreen extends StatelessWidget {
       },
     );
   }
-  // ----------------------------------------------
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -343,6 +350,10 @@ class RecipeDetailScreen extends StatelessWidget {
     );
   }
 
+
+
+  /*È un metodo privato che restituisce un widget. Usa named parameters con required — tutti e tre i parametri sono obbligatori.
+  Viene chiamato tre volte in RecipeDetailScreen per mostrare tempo, porzioni e difficoltà.*/
   Widget infoBox({
     required IconData icon,
     required String value,

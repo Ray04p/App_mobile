@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../database/database_helper.dart';
 import '../models/recipe.dart';
 import '../models/pantry_item.dart';
@@ -351,7 +350,7 @@ class AppState extends ChangeNotifier {
   // -------------------------
 
   List<Recipe> suggestedRecipes() {
-    return recipes.where((recipe) {
+    final suggested = recipes.where((recipe) {
       return recipe.isRecommended ||
           recipe.ingredients.any((ingredient) {
             return pantry.any(
@@ -361,7 +360,19 @@ class AppState extends ChangeNotifier {
             );
           });
     }).toList();
+
+    // Le ricette hardcoded (isRecommended) hanno priorità,
+    // poi le ricette con ingredienti in dispensa
+    suggested.sort((a, b) {
+      if (a.isRecommended && !b.isRecommended) return -1;
+      if (!a.isRecommended && b.isRecommended) return 1;
+      return 0;
+    });
+
+    // Massimo 5 suggerimenti
+    return suggested.take(5).toList();
   }
+
   
   List<PantryItem> expiringItems() {
     return pantry.where((item) => item.isExpiringSoon).toList();
