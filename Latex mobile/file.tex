@@ -205,7 +205,7 @@ L’applicazione intende risolvere diversi problemi
 \hrule
 \vspace{0.5 cm}
 
-{\color{ForestGreen}\raggedright{\large \textbf{Gestione Ricette}}}
+{\color{ForestGreen}\raggedright{\large \textbf{Gestione Dispensa}}}
 \begin{itemize}
     \item Visualizzazione con ricerca per nome e categoria.
     \item Raggruppamento automatico in: Prodotti Scaduti, In Scadenza (entro 3 giorni), Altri Prodotti.
@@ -270,7 +270,7 @@ L’applicazione intende risolvere diversi problemi
     \item Gestione avanzata delle scadenze con tre livelli di allerta visiva (scaduto, in scadenza, a norma) e ordinamento per data. Sia la sezione Statistiche dell’applicazione sia la sezione Dispensa tengono traccia dei prodotti vicini alla scadenza e dei prodotti scaduti. 
 \end{itemize}
 
-\subsection{Feature avanzate scelte}
+\subsection{Eventuali limitazioni note}
 \begin{itemize}
     \item La gestione delle unità di misura non include conversioni automatiche (es. g → kg): la corrispondenza avviene per stringa esatta.
     \item Le immagini delle ricette vengono salvate con il percorso assoluto locale, quindi non sono portabili tra dispositivi diversi.
@@ -284,19 +284,19 @@ L’applicazione intende risolvere diversi problemi
 \subsection{Struttura generale}
 L’app è strutturata in tre livelli architetturali distinti:
 \begin{itemize}
-    \item Presentazione (UI Layer): schermate Flutter e widget riutilizzabili.
-    \item Stato e logica (State Layer): AppState gestisce lo stato globale e le operazioni sui dati.
-    \item Persistenza (Data Layer): DatabaseHelper per SQLite (ricette) e SharedPreferences per gli altri dati.
+    \item \textbf{Presentazione} (UI Layer): schermate Flutter e widget riutilizzabili.
+    \item \textbf{Stato e logica} (State Layer): AppState gestisce lo stato globale e le operazioni sui dati.
+    \item \textbf{Persistenza} (Data Layer): DatabaseHelper per SQLite (ricette) e SharedPreferences per gli altri dati.
 \end{itemize}
 
 \vspace{0.5 cm}
-L’applicazione si suddivide in 5 sezioni principali: Ricette, Dispensa, Meal Plan, Lista Spesa e Statistiche:
+L’applicazione si suddivide in 5 sezioni principali:
 \begin{itemize}
-    \item La sezione Ricette permette di cercare, aggiungere o rimuovere una ricetta, aggiungere o rimuovere una ricetta dai preferiti, visualizzare la lista di ricette, la lista di ricette preferite e la lista di ricette consigliate dalla dispensa.
-    \item La sezione Dispensa permette di cercare, aggiungere o rimuovere un prodotto e di visualizzare la lista dei prodotti.
-    \item La sezione Meal Plan permette di pianificare i pasti di ogni giorno scegliendo una ricetta e di visualizzare i pasti pianificati.
-    \item La sezione Lista Spesa permette di aggiungere o rimuovere uno o più elementi dalla lista e di visualizzare la lista della spesa. Permette inoltre di generare una lista automaticamente dal meal plan.
-    \item La sezione Statistiche visualizza una serie di statistiche relative alle ricette salvate, ai pasti pianificati, ai prodotti in scadenza o scaduti, alle ricette preferite e calcola il tempo medio di preparazione delle ricette salvate.    
+    \item La sezione \textbf{Ricette} permette di cercare, aggiungere o rimuovere una ricetta, aggiungere o rimuovere una ricetta dai preferiti, visualizzare la lista di ricette, la lista di ricette preferite e la lista di ricette consigliate dalla dispensa.
+    \item La sezione \textbf{Dispensa} permette di cercare, aggiungere o rimuovere un prodotto e di visualizzare la lista dei prodotti.
+    \item La sezione \textbf{Meal Plan} permette di pianificare i pasti di ogni giorno scegliendo una ricetta e di visualizzare i pasti pianificati.
+    \item La sezione \textbf{Lista Spesa} permette di aggiungere o rimuovere uno o più elementi dalla lista e di visualizzare la lista della spesa. Permette inoltre di generare una lista automaticamente dal meal plan.
+    \item La sezione \textbf{Statistiche} visualizza una serie di statistiche relative alle ricette salvate, ai pasti pianificati, ai prodotti in scadenza o scaduti, alle ricette preferite e calcola il tempo medio di preparazione delle ricette salvate.    
 \end{itemize}
 
 % --- tabella ----
@@ -407,7 +407,7 @@ Questi schemi, affinati attraverso diverse iterazioni, hanno fornito una fondame
 %--- seconda tabella ----
 \newpage
 \subsection{Organizzazione dei Dati}
-\normalsize Dati dell’app sono organizzati in \textbf{cinque entità principali}:
+\normalsize Dati dell’app sono organizzati in \textbf{5 entità principali}:
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.5}
@@ -579,22 +579,36 @@ Mentre se l’ingrediente è già nella lista della spesa con la stessa unità, 
 Questo approccio evita ridondanze e produce una lista spesa ottimizzata e pulita.
 \newline
 
+\vspace{0.5 cm}
+\hrule
+\vspace{0.5 cm}
+
 {\color{ForestGreen}\raggedright{\textbf{Database SQLite con Relazione Uno-a-Molti}}}\\
 La gestione del database in \textbf{\texttt{DatabaseHelper}} affronta il problema classico delle relazioni in SQLite. \\
 L’operazione "getRecipes()" esegue prima una query sulla tabella recipes, poi per ogni ricetta una query secondaria su recipe\_ingredients filtrata per recipeId. \\
 Questa strategia è accettabile per le dimensioni tipiche di un ricettario personale e mantiene il codice semplice e leggibile.
 \newline
 
+\vspace{0.5 cm}
+\hrule
+\vspace{0.5 cm}
+
 {\color{ForestGreen}\raggedright{\textbf{Form Ingredienti Dinamico}}}\\
 \textbf{\texttt{RecipeFormScreen}} implementa un sistema di righe ingredienti completamente dinamico tramite la classe di supporto \textbf{\texttt{IngredientRow}}, che incapsula i tre \textbf{\texttt{TextEditingController}} di ogni riga (nome, quantità, unità). \\
 Il metodo dispose() di ogni \textbf{\texttt{IngredientRow}} viene richiamato correttamente quando la riga viene rimossa o quando il form viene chiuso, prevenendo memory leak.
 \newline
+
+\vspace{0.5 cm}
+\hrule
+\vspace{0.5 cm}
 
 {\color{ForestGreen}\raggedright{\textbf{Suggerimento Ricette}}}\\
 Il metodo suggestedRecipes() in AppState restituisce le ricette che hanno almeno un ingrediente presente in dispensa oppure che sono state marcate come raccomandate (isRecommended). \\
 Le ricette raccomandate vengono mostrate con priorità e il numero massimo di suggerimenti visualizzati è limitato a cinque. \\
 Il confronto avviene per nome normalizzato \textbf{\texttt{(toLowerCase().trim())}} per gestire variazioni di maiuscolo/minuscolo e spazi.
 \newline
+
+\newpage
 
 {\color{ForestGreen}\raggedright{\textbf{Trasferimento Lista Spesa → Dispensa}}}\\
 La funzione \textbf{\texttt{showAddToPantryDialog()}} in \textbf{\texttt{ShoppingListScreen}} implementa un \textbf{\texttt{dialog}} contestuale che appare quando l’utente preme il tasto elimina su un elemento della lista. \\
@@ -605,10 +619,6 @@ Questo aumenta la semplicità con cui è possibile tenere la dispensa aggiornata
 
 
 
-
-
-
-\newpage
 \section{Conclusione}
 Il progetto ha consentito di applicare i principali concetti affrontati durante il corso di \textbf{Mobile Programming}, tra cui gestione dello stato, navigazione, persistenza locale, progettazione dell'interfaccia utente e organizzazione del codice.\\
 L'applicazione sviluppata risulta completa, estendibile e utilizzabile in un contesto reale per la pianificazione dei pasti e la gestione della dispensa domestica. 
