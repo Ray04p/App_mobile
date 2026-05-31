@@ -10,18 +10,11 @@ import '../providers/app_state.dart';
 class IngredientRow {
   final TextEditingController nameController;
   final TextEditingController quantityController;
-  String selectedUnit; // Non è più un controller, ma una stringa fissa
-
-  // La lista delle unità consentite come costante statica
-  static const allowedUnits = [
-    'g', 'kg', 'ml', 'L', 'pz', 'oz', 'lb', 
-    'cucchiaio', 'tazza', 'bustina', 'a piacere', 'Altro'
-  ];
 
   IngredientRow({String name = '', String quantity = '', String unit = ''})
       : nameController = TextEditingController(text: name),
         quantityController = TextEditingController(text: quantity),
-        // Programmazione difensiva: se modifichiamo una vecchia ricetta con
+        // Se modifichiamo una vecchia ricetta con
         // un'unità non valida (es. "grammi"), impostiamo di default "Altro" o "g"
         // per evitare il crash del Dropdown.
         selectedUnit = allowedUnits.contains(unit) 
@@ -32,6 +25,12 @@ class IngredientRow {
     nameController.dispose();
     quantityController.dispose();
   }
+
+  String selectedUnit;
+  static const allowedUnits = [
+    'g', 'kg', 'ml', 'L', 'pz', 'oz', 'lb', 
+    'cucchiaio', 'tazza', 'bustina', 'a piacere', 'Altro'
+  ];  
 }
 
 class RecipeFormScreen extends StatefulWidget {

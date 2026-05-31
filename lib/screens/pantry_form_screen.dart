@@ -215,7 +215,7 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
             field('Nome prodotto', name),
             field('Categoria', category),
             field('Quantità',quantity,type: TextInputType.number,
-              validator: (value) { //verifica se l'utente inserisci un numero naturale o altro 
+              validator: (value) { //verifica se l'utente inserisce un numero naturale o altro 
                 if (value == null || value.trim().isEmpty) return 'Campo obbligatorio';
                 final doubleValue = double.tryParse(value);
                 if (doubleValue == null) return 'Inserisci un numero intero valido';

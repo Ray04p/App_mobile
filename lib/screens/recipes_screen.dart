@@ -51,7 +51,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
   Widget recipeImage(Recipe recipe) {
     final path = recipe.imagePath;
 
-    // Caso 1: nessuna immagine → placeholder grigio
+    // Caso 1: nessuna immagine: placeholder grigio
     if (path == null || path.isEmpty) {
       return Container(
         color: Colors.grey.shade200,
@@ -74,7 +74,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
       );
     }
 
-    // Caso 4: file locale esistente → carica dal filesystem
+    // Caso 4: file locale esistente: carica dal filesystem
     return Image.file(file, fit: BoxFit.cover);
   }
 
@@ -316,7 +316,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
           sectionTitle('Categorie'),
           const SizedBox(height: 14),
 
-          // Filtro per categoria — scorrimento orizzontale
+          // Filtro per categoria con scorrimento orizzontale
           SizedBox(
             height: 105,
             child: ListView(
@@ -430,7 +430,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
     );
   }
 
-  // Titolo di sezione con stile coerente all'app
+  // Titolo di sezione
   Widget sectionTitle(String title) {
     return Text(
       title,

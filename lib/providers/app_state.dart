@@ -13,7 +13,6 @@ class AppState extends ChangeNotifier {
   List<MealPlanItem> mealPlan = [];
   List<ShoppingItem> shoppingList = [];
 
-  // --- 1. NUOVO STATO DEL FILTRO ---
   bool _showOnlyAvailable = false;
   bool get showOnlyAvailable => _showOnlyAvailable;
   // ---------------------------------
@@ -106,14 +105,13 @@ class AppState extends ChangeNotifier {
         // Se non ne abbiamo affatto, la ricetta fallisce immediatamente
         if (matchingPantryItems.isEmpty) return false;
 
-        // 2. Sommiamo le quantità (castiamo a num.toDouble() per sicurezza
-        // nel caso il tuo PantryItem abbia quantity come int invece che double)
+        // 2. Sommiamo le quantità (castiamo a num.toDouble() per sicurezza)
         final totalAvailable = matchingPantryItems.fold<double>(
           0.0, 
           (sum, item) => sum + (item.quantity as num).toDouble()
         );
 
-        // 3. Il verdetto: ne abbiamo a sufficienza?
+        // 3. controlla se ne abbiamo a sufficienza
         return totalAvailable >= recipeIng.quantity;
       });
     }).toList();
