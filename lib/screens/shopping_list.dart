@@ -15,10 +15,13 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   final nameController = TextEditingController();
   final quantityController = TextEditingController();
   
-  // 1. LA VARIABILE DI STATO PER LA TENDINA
+  // VARIABILE DI STATO PER LA TENDINA
   String selectedUnit = 'pz';
 
-  // 2. LE UNITÀ CONSENTITE
+  //tasto seleziona tutti - annulla
+  bool _allSelected = false;
+
+  // UNITÀ CONSENTITE
   static const allowedUnits = [
     'g', 'kg', 'ml', 'L', 'pz', 'oz', 'lb', 
     'cucchiaio', 'tazza', 'bustina', 'a piacere', 'Altro'
@@ -33,7 +36,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         ) ??
         0;
 
-    // 3. SALVATAGGIO USANDO IL VALORE DELLA TENDINA
+    // SALVATAGGIO USANDO IL VALORE DELLA TENDINA
     app.addShoppingItem(name, quantity: quantity, unit: selectedUnit);
 
     nameController.clear();
@@ -93,11 +96,11 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                 ),
                 const SizedBox(width: 6),
                 
-                // 4. IL MENU A TENDINA (Sostituisce il TextField)
+                // MENU A TENDINA
                 SizedBox(
                   width: 90,
                   child: DropdownButtonFormField<String>(
-                    value: selectedUnit,
+                    initialValue: selectedUnit,
                     decoration: const InputDecoration(
                       labelText: 'Unità',
                       border: OutlineInputBorder(),
@@ -166,16 +169,29 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                   child: OutlinedButton.icon(
                     onPressed: app.shoppingList.isEmpty
                         ? null
-                        : app.selectAllShoppingItems,
-                    icon: const Icon(Icons.select_all),
-                    label: const Text('Seleziona tutti'),
+                        : () {
+                            if (_allSelected) {
+                              // Annulla: deseleziona tutto
+                              app.deselectAllShoppingItems();
+                              setState(() => _allSelected = false);
+                            } else {
+                              // Seleziona tutto
+                              app.selectAllShoppingItems();
+                              setState(() => _allSelected = true);
+                            }
+                          },
+                    icon: Icon(_allSelected ? Icons.close : Icons.select_all),
+                    label: Text(_allSelected ? 'Annulla' : 'Seleziona tutti'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: app.shoppingList.any((item) => item.purchased)
-                        ? app.deleteSelectedShoppingItems
+                        ? () {
+                            app.deleteSelectedShoppingItems();
+                            setState(() => _allSelected = false);
+                          }
                         : null,
                     icon: const Icon(Icons.delete_sweep),
                     label: const Text('Elimina selezionati'),
@@ -274,7 +290,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                         Expanded(
                           flex: 1,
                           child: DropdownButtonFormField<String>(
-                            value: dialogSelectedUnit,
+                            initialValue: dialogSelectedUnit,
                             decoration: const InputDecoration(
                               labelText: 'Unità',
                               border: OutlineInputBorder(),

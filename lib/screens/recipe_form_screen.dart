@@ -308,7 +308,7 @@ class _RecipeFormScreenState extends State<RecipeFormScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: DropdownButtonFormField<String>(
-                        value: row.selectedUnit,
+                        initialValue: row.selectedUnit,
                         decoration: InputDecoration(
                           labelText: 'Unità',
                           labelStyle: const TextStyle(

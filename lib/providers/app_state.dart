@@ -300,6 +300,14 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deselectAllShoppingItems() {
+    for (final item in shoppingList) {
+      item.purchased = false;
+    }
+    saveData();
+    notifyListeners();
+  }
+
   void deleteSelectedShoppingItems() {
     shoppingList.removeWhere((item) => item.purchased);
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/services.dart';
 import '../models/pantry_item.dart';
 import '../providers/app_state.dart';
 
@@ -122,6 +122,9 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
         controller: controller,
         keyboardType: type,
         textInputAction: action, //action per andare da capo con invio
+        inputFormatters: type == TextInputType.number
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]
+          : null,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
