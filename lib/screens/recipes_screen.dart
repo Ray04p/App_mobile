@@ -169,7 +169,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
           // Barra di ricerca testuale
           TextField(
             decoration: InputDecoration(
-              hintText: 'Cerca ricette o ingredienti...',
+              hintText: 'Cerca una ricetta o categoria...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: const Color(0xFFF1F0E8),

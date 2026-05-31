@@ -22,7 +22,7 @@ class DatabaseHelper {
     
     return await openDatabase(
       path,
-      version: 10, 
+      version: 11, 
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onConfigure: _onConfigure, // Necessario per abilitare le Foreign Keys in SQLite
@@ -70,9 +70,9 @@ class DatabaseHelper {
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     // Gestione degli aggiornamenti
     // Ricrea tutto da zero eliminando le tabelle vecchie
-    //await db.execute('DROP TABLE IF EXISTS recipe_ingredients');
-    //await db.execute('DROP TABLE IF EXISTS recipes');
-    //await _createDB(db, newVersion);
+    await db.execute('DROP TABLE IF EXISTS recipe_ingredients');
+    await db.execute('DROP TABLE IF EXISTS recipes');
+    await _createDB(db, newVersion);
   }
 
   // INSERIMENTO
@@ -160,7 +160,7 @@ class DatabaseHelper {
         'difficulty': 'Facile',
         'portions': 2,
         'notes': 'Aggiungere basilico fresco a fine cottura.',
-        'imagePath': null,
+        'imagePath': 'assets/images/pasta_pomodoro.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
@@ -172,7 +172,7 @@ class DatabaseHelper {
         'difficulty': 'Facile',
         'portions': 2,
         'notes': '',
-        'imagePath': null,
+        'imagePath': 'assets/images/insalata_mista.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
@@ -184,7 +184,7 @@ class DatabaseHelper {
         'difficulty': 'Facile',
         'portions': 2,
         'notes': 'Servire con spicchi di limone.',
-        'imagePath': null,
+        'imagePath': 'assets/images/pollo_griglia.jpg',
         'isRecommended': 1,
         'isFavorite': 0,
       },
