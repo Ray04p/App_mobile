@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../database/database_helper.dart';
 import '../models/recipe.dart';
 import '../models/pantry_item.dart';
@@ -13,6 +12,10 @@ class AppState extends ChangeNotifier {
   List<PantryItem> pantry = [];
   List<MealPlanItem> mealPlan = [];
   List<ShoppingItem> shoppingList = [];
+
+  bool _showOnlyAvailable = false;
+  bool get showOnlyAvailable => _showOnlyAvailable;
+  // ---------------------------------
 
   AppState() {
     loadData();
@@ -70,6 +73,48 @@ class AppState extends ChangeNotifier {
       'shoppingList',
       jsonEncode(shoppingList.map((e) => e.toJson()).toList()),
     );
+  }
+
+  // -------------------------
+  // FILTRAGGIO
+  // -------------------------
+
+  void toggleAvailableFilter(bool value) {
+    _showOnlyAvailable = value;
+    notifyListeners();
+  }
+
+  List<Recipe> get filteredRecipes {
+    // Se l'interruttore è spento, mostriamo tutto
+    if (!_showOnlyAvailable) {
+      return recipes;
+    }
+
+    return recipes.where((recipe) {
+      // Se non ha ingredienti, la mostriamo a prescindere
+      if (recipe.ingredients.isEmpty) return true;
+
+      // Tutti gli ingredienti della ricetta devono superare il test matematico
+      return recipe.ingredients.every((recipeIng) {
+        
+        // 1. Troviamo gli elementi in dispensa col nome corrispondente
+        final matchingPantryItems = pantry.where((pantryItem) => 
+          pantryItem.name.toLowerCase().trim() == recipeIng.name.toLowerCase().trim()
+        );
+
+        // Se non ne abbiamo affatto, la ricetta fallisce immediatamente
+        if (matchingPantryItems.isEmpty) return false;
+
+        // 2. Sommiamo le quantità (castiamo a num.toDouble() per sicurezza)
+        final totalAvailable = matchingPantryItems.fold<double>(
+          0.0, 
+          (sum, item) => sum + (item.quantity as num).toDouble()
+        );
+
+        // 3. controlla se ne abbiamo a sufficienza
+        return totalAvailable >= recipeIng.quantity;
+      });
+    }).toList();
   }
 
   // -------------------------
@@ -137,7 +182,7 @@ class AppState extends ChangeNotifier {
     final item = pantry.removeAt(oldIndex);
     pantry.insert(newIndex, item);
 
-    saveData(); // Fondamentale per salvare il nuovo ordine in SharedPreferences!
+    saveData(); 
     notifyListeners();
   }
 
@@ -149,6 +194,16 @@ class AppState extends ChangeNotifier {
     mealPlan.add(item);
     saveData();
     notifyListeners();
+  }
+
+  void updateMealPlanItem(MealPlanItem updatedItem) {
+    final index = mealPlan.indexWhere((item) => item.id == updatedItem.id);
+
+    if (index != -1) {
+      mealPlan[index] = updatedItem;
+      saveData();
+      notifyListeners();
+    }
   }
 
   void deleteMealPlanItem(String id) {
@@ -183,13 +238,36 @@ class AppState extends ChangeNotifier {
   // LISTA SPESA
   // -------------------------
 
-  void addShoppingItem(String name) {
-    shoppingList.add(
-      ShoppingItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: name,
-      ),
+  void addShoppingItem(String name, {double quantity = 0, String unit = ''}) {
+    final normalizedName = name.toLowerCase().trim();
+    final normalizedUnit = unit.toLowerCase().trim();
+    final existingIndex = shoppingList.indexWhere(
+      (item) =>
+          item.name.toLowerCase().trim() == normalizedName &&
+          item.unit.toLowerCase().trim() == normalizedUnit,
     );
+
+    if (existingIndex != -1) {
+      if (quantity > 0) {
+        final existing = shoppingList[existingIndex];
+        shoppingList[existingIndex] = ShoppingItem(
+          id: existing.id,
+          name: existing.name,
+          quantity: existing.quantity + quantity,
+          unit: existing.unit,
+          purchased: existing.purchased,
+        );
+      }
+    } else {
+      shoppingList.add(
+        ShoppingItem(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          name: name.trim(),
+          quantity: quantity,
+          unit: unit.trim(),
+        ),
+      );
+    }
 
     saveData();
     notifyListeners();
@@ -211,30 +289,86 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void generateShoppingListFromMealPlan() {
-    final pantryNames = pantry
-        .map((item) => item.name.toLowerCase().trim())
-        .toList();
+  void selectAllShoppingItems() {
+    for (final item in shoppingList) {
+      item.purchased = true;
+    }
 
-    for (final planItem in mealPlan) {
+    saveData();
+    notifyListeners();
+  }
+
+  void deselectAllShoppingItems() {
+    for (final item in shoppingList) {
+      item.purchased = false;
+    }
+    saveData();
+    notifyListeners();
+  }
+
+  void deleteSelectedShoppingItems() {
+    shoppingList.removeWhere((item) => item.purchased);
+
+    saveData();
+    notifyListeners();
+  }
+
+  void generateShoppingListFromMealPlan() {
+    final currentWeekKey = MealPlanItem.currentWeekStart();
+    final thisWeekPlan = mealPlan.where((item) => item.weekStart == currentWeekKey);
+
+    for (final planItem in thisWeekPlan) {
       final recipe = recipeById(planItem.recipeId);
 
       if (recipe == null) continue;
 
       for (final ingredient in recipe.ingredients) {
-        final ingredientName = ingredient.toLowerCase().trim();
+        final ingredientName = ingredient.name.toLowerCase().trim();
+        final ingredientUnit = ingredient.unit.toLowerCase().trim();
 
-        final alreadyInPantry = pantryNames.contains(ingredientName);
-
-        final alreadyInShoppingList = shoppingList.any(
-          (item) => item.name.toLowerCase().trim() == ingredientName,
+        // Cerca in dispensa lo stesso ingrediente con la stessa unità
+        final matchingPantryItems = pantry.where(
+          (item) =>
+              item.name.toLowerCase().trim() == ingredientName &&
+              item.unit.toLowerCase().trim() == ingredientUnit  &&
+              !item.isExpired,
         );
 
-        if (!alreadyInPantry && !alreadyInShoppingList) {
+        // Somma la quantità disponibile in dispensa
+        final availableQuantity = matchingPantryItems.fold<double>(
+          0.0,
+          (sum, item) => sum + item.quantity,
+        );
+
+        // Calcola solo la quantità mancante
+        final missingQuantity = ingredient.quantity - availableQuantity;
+
+        // Se ne abbiamo abbastanza, non lo aggiungiamo alla lista spesa
+        if (missingQuantity <= 0) continue;
+
+        final existingIndex = shoppingList.indexWhere(
+          (item) =>
+              item.name.toLowerCase().trim() == ingredientName &&
+              item.unit.toLowerCase().trim() == ingredientUnit,
+        );
+
+        if (existingIndex != -1) {
+          final existing = shoppingList[existingIndex];
+
+          shoppingList[existingIndex] = ShoppingItem(
+            id: existing.id,
+            name: existing.name,
+            quantity: existing.quantity + missingQuantity,
+            unit: existing.unit,
+            purchased: existing.purchased,
+          );
+        } else {
           shoppingList.add(
             ShoppingItem(
               id: DateTime.now().microsecondsSinceEpoch.toString(),
-              name: ingredient,
+              name: ingredient.name,
+              quantity: missingQuantity,
+              unit: ingredient.unit,
             ),
           );
         }
@@ -250,9 +384,30 @@ class AppState extends ChangeNotifier {
   // -------------------------
 
   List<Recipe> suggestedRecipes() {
-    return recipes.where((recipe) => recipe.isRecommended).toList();
+    final suggested = recipes.where((recipe) {
+      return recipe.isRecommended ||
+          recipe.ingredients.any((ingredient) {
+            return pantry.any(
+              (item) =>
+                  item.name.toLowerCase().trim() ==
+                  ingredient.name.toLowerCase().trim(),
+            );
+          });
+    }).toList();
+
+    // Le ricette hardcoded (isRecommended) hanno priorità,
+    // poi le ricette con ingredienti in dispensa
+    suggested.sort((a, b) {
+      if (a.isRecommended && !b.isRecommended) return -1;
+      if (!a.isRecommended && b.isRecommended) return 1;
+      return 0;
+    });
+
+    // Massimo 5 suggerimenti
+    return suggested.take(5).toList();
   }
 
+  
   List<PantryItem> expiringItems() {
     return pantry.where((item) => item.isExpiringSoon).toList();
   }

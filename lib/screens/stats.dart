@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meal_planner_project/screens/favorite_screen.dart';
 import 'package:provider/provider.dart';
-import 'recipes_screen.dart';
 import '../providers/app_state.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -12,25 +12,35 @@ class StatsScreen extends StatelessWidget {
     final expiring = app.expiringItems();
     final expired = app.expiredItems();
 
-    final avgTime = app.recipes.isEmpty
-        ? 0
-        : app.recipes.map((e) => e.preparationTime).reduce((a, b) => a + b) ~/
-              app.recipes.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Statistiche')),
+      appBar: AppBar(
+        title: const Text('Statistiche',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 29, 102, 34),
+            fontFamily: 'serif'
+          ),
+        ),
+      ),
+
+
+      //ELENCO STATISTICHE
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           statCard('Ricette salvate', app.recipes.length.toString()),
+          statCard('Tempo medio di preparazione delle ricette', '${app.averagePreparationTime} min'),
           statCard('Prodotti in dispensa', app.pantry.length.toString()),
           statCard('Pasti pianificati', app.mealPlan.length.toString()),
           statCard('Elementi lista spesa', app.shoppingList.length.toString()),
-          statCard('Tempo medio preparazione', '$avgTime min'),
           statCard('Prodotti vicini alla scadenza', expiring.length.toString()),
           statCard('Prodotti scaduti', expired.length.toString()),
+          
 
-          const SizedBox(height: 16),
+          //PRODOTTI IN SCADENZA
+          const SizedBox(height: 30),
           const Text(
             'Prodotti in scadenza',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -43,6 +53,23 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
 
+          //PRODOTTI SCADUTI
+          const SizedBox(height: 16),
+          const Text(
+            'Prodotti scaduti',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          ...expired.map(
+            (item) => ListTile(
+              leading: const Icon(Icons.warning, color: Colors.red),
+              title: Text(item.name),
+              subtitle: Text('${item.quantity} ${item.unit}'),
+            ),
+          ),
+
+
+          //BOX PREFERITE
+          const SizedBox(height: 16),
           Card(
             color: Colors.red.shade50,
             child: ListTile(
@@ -58,7 +85,7 @@ class StatsScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const RecipesScreen()),
+                  MaterialPageRoute(builder: (_) => const FavoriteRecipesScreen()),
                 );
               },
             ),
@@ -68,6 +95,7 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
+  //È un metodo privato della classe che genera una card con titolo a sinistra e valore numerico grande a destra. Viene chiamato 7 volte in ListViewcon dati diversi.
   Widget statCard(String title, String value) {
     return Card(
       child: ListTile(

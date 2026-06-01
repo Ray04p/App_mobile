@@ -1,29 +1,58 @@
 import 'package:flutter/material.dart';
-import 'recipes_screen.dart';
-import 'pantry_screen.dart';
-import 'meal_plan_screen.dart';
-import 'shopping_list.dart';
-import 'stats.dart';
+import 'main_screen.dart';
+import 'favorite_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void open(BuildContext context, Widget screen) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
-  }
-
   @override
   Widget build(BuildContext context) {
     final items = [
-      ['Ricette', Icons.restaurant_menu, const RecipesScreen()],
-      ['Dispensa', Icons.kitchen, const PantryScreen()],
-      ['Meal Plan', Icons.calendar_month, const MealPlanScreen()],
-      ['Lista Spesa', Icons.shopping_cart, const ShoppingListScreen()],
-      ['Statistiche', Icons.bar_chart, const StatsScreen()],
+      ['Ricette', Icons.restaurant_menu, 0],
+      ['Preferite', Icons.favorite, -1],
+      ['Dispensa', Icons.kitchen, 1],
+      ['Meal Plan', Icons.calendar_month, 2],
+      ['Lista Spesa', Icons.shopping_cart, 3],
+      ['Statistiche', Icons.bar_chart, 4],
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('MealMate')),
+      //TITOLO E SLOGAN
+      appBar: AppBar(
+        toolbarHeight: 110,
+        centerTitle: true,
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'MealMate',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+                fontFamily: 'serif'
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'La tua cucina sempre sotto controllo.',
+              textAlign: TextAlign.center,
+              softWrap: true,
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+                fontFamily: 'serif'
+              ),
+            ),
+          ],
+        ),
+      ),
+
+
+      //GRIGLIA
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.builder(
@@ -33,21 +62,46 @@ class HomeScreen extends StatelessWidget {
             mainAxisSpacing: 14,
             crossAxisSpacing: 14,
           ),
+
+          //SINGOLA CARD
           itemBuilder: (context, index) {
             return Card(
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => open(context, items[index][2] as Widget),
+                onTap: () {
+                  final selectedIndex = items[index][2] as int;
+
+                  if (selectedIndex == -1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FavoriteRecipesScreen(),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MainScreen(
+                        initialIndex: selectedIndex,
+                      ),
+                    ),
+                  );
+                },
+                //stile della card
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(items[index][1] as IconData, size: 42),
+                    Icon(items[index][1] as IconData, size: 42, color: Colors.green[900]),
                     const SizedBox(height: 10),
                     Text(
                       items[index][0] as String,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 27, 94, 32),
                       ),
                     )
                   ],

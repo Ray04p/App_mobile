@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/services.dart';
 import '../models/pantry_item.dart';
 import '../providers/app_state.dart';
 
@@ -22,6 +22,24 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
   late TextEditingController unit;
   late TextEditingController notes;
 
+  final units = [
+    'g',
+    'kg',
+    'ml',
+    'L',
+    'pz',
+    'oz',
+    'lb',
+    'cucchiaio',
+    'tazza',
+    'bustina',
+    'a piacere',
+    'Altro',
+  ];
+
+  String? selectedUnit;
+  bool customUnit = false;
+
   DateTime? expiryDate;
 
   @override
@@ -32,8 +50,24 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
 
     name = TextEditingController(text: item?.name ?? '');
     category = TextEditingController(text: item?.category ?? '');
-    quantity = TextEditingController(text: item?.quantity.toString() ?? '');
+    quantity = TextEditingController(
+      text: item == null
+          ? ''
+          : (item.quantity.truncateToDouble() == item.quantity
+              ? item.quantity.toInt().toString()
+              : item.quantity.toString()),
+    );
     unit = TextEditingController(text: item?.unit ?? '');
+    if (item != null && units.contains(item.unit)) {
+      selectedUnit = item.unit;
+      customUnit = false;
+    } else if (item != null && item.unit.isNotEmpty) {
+      selectedUnit = 'Altro';
+      customUnit = true;
+    } else {
+      selectedUnit = null;
+      customUnit = false;
+    }
     notes = TextEditingController(text: item?.notes ?? '');
     expiryDate = item?.expiryDate;
   }
@@ -83,11 +117,14 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
     String? Function(String?)? validator,}) {
       
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
         controller: controller,
         keyboardType: type,
         textInputAction: action, //action per andare da capo con invio
+        inputFormatters: type == TextInputType.number
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]
+          : null,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
@@ -101,6 +138,64 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
               return null;
             },
       ),
+    );
+  }
+
+
+  Widget unitDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<String>(
+          initialValue: selectedUnit,
+          decoration: const InputDecoration(
+            labelText: 'Unità di misura',
+            border: OutlineInputBorder(),
+          ),
+          items: units.map((u) {
+            return DropdownMenuItem(
+              value: u,
+              child: Text(u),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedUnit = value;
+
+              if (value == 'Altro') {
+                customUnit = true;
+                unit.clear();
+              } else {
+                customUnit = false;
+                unit.text = value ?? '';
+              }
+            });
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Seleziona un’unità di misura';
+            }
+            return null;
+          },
+        ),
+        if (customUnit) ...[
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: unit,
+            decoration: const InputDecoration(
+              labelText: 'Unità personalizzata',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (customUnit && (value == null || value.trim().isEmpty)) {
+                return 'Inserisci un’unità personalizzata';
+              }
+              return null;
+            },
+          ),
+        ],
+        const SizedBox(height: 12),
+      ],
     );
   }
 
@@ -120,7 +215,7 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
             field('Nome prodotto', name),
             field('Categoria', category),
             field('Quantità',quantity,type: TextInputType.number,
-              validator: (value) { //verifica se l'utente inserisci un numero naturale o altro 
+              validator: (value) { //verifica se l'utente inserisce un numero naturale o altro 
                 if (value == null || value.trim().isEmpty) return 'Campo obbligatorio';
                 final doubleValue = double.tryParse(value);
                 if (doubleValue == null) return 'Inserisci un numero intero valido';
@@ -128,7 +223,7 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
                 return null;
               },
             ),
-            field('Unità di misura', unit),
+            unitDropdown(),
             field('Note', notes,
               validator: (value) => null,
             ),

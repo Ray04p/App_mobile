@@ -1,3 +1,5 @@
+import 'recipe_ingredient.dart';
+
 class Recipe {
   int? id;
   String name;
@@ -6,8 +8,9 @@ class Recipe {
   int preparationTime;
   String difficulty;
   int portions;
-  List<String> ingredients;
+  List<RecipeIngredient> ingredients; 
   String notes;
+  String? imagePath;
   bool isRecommended;
   bool isFavorite;
 
@@ -21,21 +24,23 @@ class Recipe {
     required this.portions,
     required this.ingredients,
     this.notes = '',
+    this.imagePath,
     this.isRecommended = false,
     this.isFavorite = false,
   });
 
+
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'name': name,
       'description': description,
       'category': category,
       'preparationTime': preparationTime,
       'difficulty': difficulty,
       'portions': portions,
-      'ingredients': ingredients.join(','),
       'notes': notes,
+      'imagePath': imagePath,
       'isRecommended': isRecommended ? 1 : 0,
       'isFavorite': isFavorite ? 1 : 0,
     };
@@ -50,15 +55,11 @@ class Recipe {
       preparationTime: map['preparationTime'],
       difficulty: map['difficulty'],
       portions: map['portions'],
-      ingredients: map['ingredients']
-          .toString()
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList(),
-      notes: map['notes'] ?? '',
-      isRecommended: map['isRecommended'] == 1,
-      isFavorite: map['isFavorite'] == 1,
+      ingredients: [], // Inizializzata vuota di default
+      notes: map['notes'] ?? '',  //Se json['notes'] esiste e non è null, usa quel valore, altrimenti stringa vuota ''
+      imagePath: map['imagePath'],
+      isRecommended: map['isRecommended'] == 1, //cast da int a bool
+      isFavorite: map['isFavorite'] == 1,   //cast da int a bool
     );
   }
 }
