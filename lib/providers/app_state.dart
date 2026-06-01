@@ -330,7 +330,8 @@ class AppState extends ChangeNotifier {
         final matchingPantryItems = pantry.where(
           (item) =>
               item.name.toLowerCase().trim() == ingredientName &&
-              item.unit.toLowerCase().trim() == ingredientUnit,
+              item.unit.toLowerCase().trim() == ingredientUnit  &&
+              !item.isExpired,
         );
 
         // Somma la quantità disponibile in dispensa
