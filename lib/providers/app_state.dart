@@ -314,7 +314,10 @@ class AppState extends ChangeNotifier {
   }
 
   void generateShoppingListFromMealPlan() {
-    for (final planItem in mealPlan) {
+    final currentWeekKey = MealPlanItem.currentWeekStart();
+    final thisWeekPlan = mealPlan.where((item) => item.weekStart == currentWeekKey);
+
+    for (final planItem in thisWeekPlan) {
       final recipe = recipeById(planItem.recipeId);
 
       if (recipe == null) continue;

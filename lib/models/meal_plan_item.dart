@@ -25,7 +25,7 @@ class MealPlanItem {
     return MealPlanItem(
       id: json['id'],
       // Compatibilità con dati vecchi senza weekStart
-      weekStart: json['weekStart'] ?? _currentWeekStart(),
+      weekStart: json['weekStart'] ?? currentWeekStart(),
       day: json['day'],
       mealType: json['mealType'],
       recipeId: json['recipeId'],
@@ -33,7 +33,7 @@ class MealPlanItem {
   }
 
    // Calcola il lunedì della settimana corrente
-  static String _currentWeekStart() {
+  static String currentWeekStart() {
     final now = DateTime.now();
     final monday = now.subtract(Duration(days: now.weekday - 1));
     return '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
