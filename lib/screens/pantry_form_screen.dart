@@ -73,11 +73,16 @@ class _PantryFormScreenState extends State<PantryFormScreen> {
   }
 
   Future<void> pickDate() async {
+    final now = DateTime.now();
+    final initial = (expiryDate != null && expiryDate!.isAfter(now))
+        ? expiryDate!
+        : now;
+
     final date = await showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
+      firstDate: DateTime(2020),
       lastDate: DateTime(2035),
-      initialDate: expiryDate ?? DateTime.now(),
+      initialDate: initial,
     );
 
     if (date != null) {
